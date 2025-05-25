@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-vdd9l0!cj&pm0jcwthpp++=h6bo57$$7a-e*mlwg4oj5-fdu!k"
+SECRET_KEY = "dev-secret"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -45,7 +46,19 @@ INSTALLED_APPS = [
     "jobs",
 
     "rest_framework",
+    'rest_framework_simplejwt',
 ]
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'api.authentication.CustomIsAuthenticated',
+#     ],
+# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [  # Your custom JWT authentication
+        'api.authentication.CsrfExemptSessionAuthentication',     # Disable CSRF for session-based auth
+    ],
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -130,3 +143,11 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Short-lived access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Long-lived refresh token
+    'ROTATE_REFRESH_TOKENS': True,                  # Issue a new refresh token on refresh
+    'BLACKLIST_AFTER_ROTATION': True,               # Blacklist old refresh tokens
+    'AUTH_HEADER_TYPES': ('Bearer',),               # Use "Bearer" prefix for tokens
+}

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from users.models import Company
 from django.db import transaction
+from jobs.models import Job, Quote
 
 User = get_user_model()
 
@@ -51,3 +52,27 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({"company_name": "A company with this name already exists."})
 
             return user
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = ['id', 'title', 'description', 'start_date', 'customer', 'created_by', 'status', 'created_at', 'updated_at', 'is_deleted', 'deleted_date']
+        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        # Automatically set the `created_by` field to the currently authenticated user
+        validated_data['created_by'] = self.context['request'].user
+        return super().create(validated_data)
+    
+
+class QuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quote
+        fields = ['id', 'title', 'description', 'customer', 'job', 'created_by', 'status', 'total_price', 'created_at', 'updated_at', 'is_deleted', 'deleted_date']
+        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        print(f' data is {self.context['request']}')
+        # Automatically set the `created_by` field to the currently authenticated user
+        validated_data['created_by'] = self.context['request'].user
+        return super().create(validated_data)

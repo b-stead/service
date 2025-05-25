@@ -5,6 +5,7 @@ from users.models import Company
 
 User = get_user_model()
 
+
 class UserRegistrationAPITestCase(APITestCase):
     def setUp(self):
         # Set up any initial data if needed

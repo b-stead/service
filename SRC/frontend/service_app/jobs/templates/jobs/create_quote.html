@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quote</title>
+    <script>
+        async function submitQuote(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Get form data
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const customer = document.getElementById("customer").value;
+            const status = document.getElementById("status").value;
+            const total_price = document.getElementById("total_price").value;
+
+            // Get the sub token (you can replace this with how you store/retrieve the token)
+            const subToken = document.getElementById("sub_token").value;
+
+            // Prepare the request payload
+            const payload = {
+                title: title,
+                description: description,
+                customer: customer,
+                status: status,
+                total_price: total_price
+            };
+
+            try {
+                // Send the POST request
+                const response = await fetch("/jobs/quotes/create/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${subToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Handle the response
+                if (response.ok) {
+                    const data = await response.json();
+                    alert("Quote created successfully!");
+                    console.log("Response:", data);
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.detail || "Failed to create quote."}`);
+                    console.error("Error response:", errorData);
+                }
+            } catch (error) {
+                console.error("Unexpected error:", error);
+                alert("An unexpected error occurred.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Create a New Quote</h1>
+    <form id="quoteForm" onsubmit="submitQuote(event)">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+
+        <label for="customer">Customer:</label><br>
+        <input type="text" id="customer" name="customer" required><br><br>
+
+        <label for="status">Status:</label><br>
+        <select id="status" name="status" required>
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="accepted">Accepted</option>
+        </select><br><br>
+
+        <label for="total_price">Total Price:</label><br>
+        <input type="number" id="total_price" name="total_price" step="0.01" required><br><br>
+
+        <label for="sub_token">Sub Token:</label><br>
+        <input type="text" id="sub_token" name="sub_token" placeholder="Enter your sub token" required><br><br>
+
+        <button type="submit">Create Quote</button>
+    </form>
+</body>
+</html>

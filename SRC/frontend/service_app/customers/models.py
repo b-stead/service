@@ -37,9 +37,11 @@ class Customer(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.first_name}'
     
 class Address(models.Model):
     street = models.CharField(max_length=255)
@@ -47,6 +49,8 @@ class Address(models.Model):
     state = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
+    is_deleted = models.BooleanField(default=False)
+    deleted_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state}, {self.postal_code}, {self.country}"
