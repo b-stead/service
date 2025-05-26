@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 from core.custom_api import CustomAPIView
 from .serializers import UserRegistrationSerializer, JobSerializer, QuoteSerializer
 from .authentication import CustomIsAuthenticated
@@ -89,6 +90,16 @@ class ActivateAccount(TemplateView):
         user.is_active = True
         user.save()
         return self.render_to_response(context)
+    
+    # Generate new tokens for the user
+        # refresh = RefreshToken.for_user(user)
+        # access_token = str(refresh.access_token)
+
+        # # Add tokens to the context for the response
+        # context['access_token'] = access_token
+        # context['refresh_token'] = str(refresh)
+
+        # return self.render_to_response(context)
 
 class LoginDataApi(GenericAPIView):
     def get(self, request):
