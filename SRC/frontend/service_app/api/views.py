@@ -1,18 +1,101 @@
+from django.contrib.auth import get_user_model
+from django.core.validators import EmailValidator
+from django.db import IntegrityError
+from django.views.generic import TemplateView
+from django.http.response import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from core.custom_api import CustomAPIView
 from .serializers import UserRegistrationSerializer, JobSerializer, QuoteSerializer
 from .authentication import CustomIsAuthenticated
+from .utils import send_activation_email, get_user_from_token, revoke_token, is_token_valid
 
 from jobs.models import Job, Quote
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+
+User = get_user_model()
+
+class RegisterAppUser(GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Register a new user in the application.
+        """
+        email = request.data.get('email', None)
+        password = request.data.get('password', None)
+        confirm_password = request.data.get('confirm_password', None)
+
+        if email is None or password is None or confirm_password is None:
+            return Response({"data: Missing Data"}, status=status.HTTP_400_BAD_REQUEST)
+
+        data_validation_errors = []
+
+        if password != confirm_password:
+            data_validation_errors.append("Passwords do not match.")
+
+        try:
+            validator = EmailValidator()
+            validator(email)
+        except ValidationError as e:
+            print(e)
+            data_validation_errors.append(e.messages)
+
+        if len(data_validation_errors) > 0:
+            return Response({"data": data_validation_errors}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                is_active=False,
+            )
+            user.save()
+        
+        except IntegrityError as e:
+            print(e)
+            return Response({"data": "User with this email already exists."}, status=status.HTTP_409_CONFLICT)
+
+        success = send_activation_email(user)
+        if not success:
+            return Response({"data": "Failed to send activation email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"data": "User registered successfully. Please check your email to activate your account."}, status=status.HTTP_201_CREATED)
+
+class ActivateAccount(TemplateView):
+    template_name = 'api/account_activation.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        token = kwargs['token']
+
+        if token is None or not is_token_valid(token):
+            context['failed_reason'] = "Invalid or expired token."
+            return self.render_to_response(context)
+
+        try:
+            user = get_user_from_token(token)
+            # revoke invite token, makes token single use
+            revoke_token(token)
+
+        except User.DoesNotExist:
+            context['failed_reason'] = "User not found for the provided token."
+            return self.render_to_response(context)
+        
+        user.is_active = True
+        user.save()
+        return self.render_to_response(context)
+
+class LoginDataApi(GenericAPIView):
+    def get(self, request):
+        data = {
+            'message': 'You are logged in!'
+        }
+        return JsonResponse(data, status=status.HTTP_200_OK)
 
 class UserRegistrationAPIView(APIView):
     def post(self, request, *args, **kwargs):

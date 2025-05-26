@@ -29,21 +29,21 @@ class Job(models.Model):
     customer = models.ForeignKey(
         Customer,
         on_delete=models.CASCADE,
-        related_name="jobs"
+        related_name="jobs",
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="jobs_created",
         null=True,
-        blank=True
+        blank=True,
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="jobs_updated",
         null=True,
-        blank=True
+        blank=True,
     )
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
@@ -92,21 +92,22 @@ class Quote(models.Model):
         on_delete=models.SET_NULL,
         related_name="quotes",
         null=True,
-        blank=True
+        blank=True,
+
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="quotes_created",
         null=True,
-        blank=True
+        blank=True,
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="quotes_updated",
         null=True,
-        blank=True
+        blank=True,
     )
     status = models.CharField(
         max_length=10,

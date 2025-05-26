@@ -47,12 +47,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         RESEARCH = 'RES', 'Research'
         LEAD = 'LED', 'Lead'
         COMPANY_OWNER = 'CMP', 'Company Owner'
+        OWNER = 'OWN', 'Owner'
 
     role = models.CharField(
         _("User Role"),
         max_length=3,
         choices=UserRole.choices,
-        default=UserRole.STAFF
+        default=UserRole.OWNER
     )
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
