@@ -19,108 +19,39 @@ from jobs.models import Job, Quote
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth import authenticate
+import requests
+import jwt
+from django.conf import settings
+from .auth import authenticate_user, create_access_token, TokenAuthentication
 
 User = get_user_model()
 
-class RegisterAppUser(GenericAPIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        """
-        Register a new user in the application.
-        """
-        email = request.data.get('email', None)
-        password = request.data.get('password', None)
-        confirm_password = request.data.get('confirm_password', None)
-
-        if email is None or password is None or confirm_password is None:
-            return Response({"data: Missing Data"}, status=status.HTTP_400_BAD_REQUEST)
-
-        data_validation_errors = []
-
-        if password != confirm_password:
-            data_validation_errors.append("Passwords do not match.")
+class LoginAPIView(APIView):
+    """Exchange a valid Google ID token for an access token."""
+    def post(self, request):
+        id_token = request.data.get('id_token')
+        if not id_token:
+            return Response({"detail": "ID token is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            validator = EmailValidator()
-            validator(email)
-        except ValidationError as e:
-            print(e)
-            data_validation_errors.append(e.messages)
+            sub = authenticate_user(id_token=id_token)
+        except jwt.exceptions.InvalidTokenError as err:
+            return Response({"detail": f"Invalid ID token: {err}"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if len(data_validation_errors) > 0:
-            return Response({"data": data_validation_errors}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user = User.objects.create_user(
-                email=email,
-                password=password,
-                is_active=False,
-            )
-            user.save()
-        
-        except IntegrityError as e:
-            print(e)
-            return Response({"data": "User with this email already exists."}, status=status.HTTP_409_CONFLICT)
+        if not sub:
+            return Response({"detail": "Invalid ID token."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        success = send_activation_email(user)
-        if not success:
-            return Response({"data": "Failed to send activation email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response({"data": "User registered successfully. Please check your email to activate your account."}, status=status.HTTP_201_CREATED)
-
-class ActivateAccount(TemplateView):
-    template_name = 'api/account_activation.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        token = kwargs['token']
-
-        if token is None or not is_token_valid(token):
-            context['failed_reason'] = "Invalid or expired token."
-            return self.render_to_response(context)
-
-        try:
-            user = get_user_from_token(token)
-            # revoke invite token, makes token single use
-            revoke_token(token)
-
-        except User.DoesNotExist:
-            context['failed_reason'] = "User not found for the provided token."
-            return self.render_to_response(context)
-        
-        user.is_active = True
-        user.save()
-        return self.render_to_response(context)
+        access_token = create_access_token(data={'sub': sub})
+        return JsonResponse({
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": settings.TOKEN_LIFETIME_SECONDS
+        }, status=status.HTTP_200_OK)
     
-    # Generate new tokens for the user
-        # refresh = RefreshToken.for_user(user)
-        # access_token = str(refresh.access_token)
-
-        # # Add tokens to the context for the response
-        # context['access_token'] = access_token
-        # context['refresh_token'] = str(refresh)
-
-        # return self.render_to_response(context)
-
-class LoginDataApi(GenericAPIView):
-    def get(self, request):
-        data = {
-            'message': 'You are logged in!'
-        }
-        return JsonResponse(data, status=status.HTTP_200_OK)
-
-class UserRegistrationAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # Validate and create the user
-        user_serializer = UserRegistrationSerializer(data=request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-
 class JobCreateAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = JobSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():

@@ -206,3 +206,8 @@ ACCOUNT_SIGNUP_REDIRECT_URL = 'account_login'
 # ACCOUNT_ADAPTER = 'users.adapter.CustomAccountAdapter'
 # SOCIALACCOUNT_ADAPTER = 'users.adapter.CustomSocialAccountAdapter'
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+TOKEN_LIFETIME_SECONDS = 3600  # Access token lifetime (1 hour)
+TOKEN_LEEWAY_SECONDS = 60      # Leeway for token expiration
+TOKEN_ISSUER = "https://accounts.google.com"
+TOKEN_AUDIENCE = "your_google_client_id.apps.googleusercontent.com"
