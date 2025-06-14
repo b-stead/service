@@ -4,8 +4,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication
 import requests
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 # verifies the Google ID token and extracts the user's subject (sub)
 
 def jwks_client_for_issuer(iss: str) -> jwt.PyJWKClient:
@@ -41,7 +42,7 @@ def validate_access_token(token: str) -> str:
     sub = payload.get('sub')
     if not sub:
         raise AuthenticationFailed("Token does not contain a subject.")
-    if not User.objects.filter(username=sub).exists():
+    if not User.objects.filter(sub=sub).exists():
         raise AuthenticationFailed("User does not exist.")
     return sub
 

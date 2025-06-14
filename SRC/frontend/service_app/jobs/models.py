@@ -45,8 +45,8 @@ class Job(models.Model):
         null=True,
         blank=True,
     )
-    start_date = models.DateField()
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank=True, null=True)
     recurrence = models.CharField(
         max_length=12,
         choices=RecurrenceType.choices,

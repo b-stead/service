@@ -64,7 +64,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',  # Ensure all API views require authentication
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Use JWT authentication
+        'api.utils.CustomJWTAuthentication',  # Use JWT authentication
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',  # Default renderer for API responses
@@ -72,11 +72,13 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # Short-lived access token
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Short-lived access token
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Long-lived refresh token
     'ROTATE_REFRESH_TOKENS': True,                  # Issue a new refresh token on refresh
     'BLACKLIST_AFTER_ROTATION': True,               # Blacklist old refresh tokens
     'AUTH_HEADER_TYPES': ('Bearer',),               # Use "Bearer" prefix for tokens
+    'AUTH_TOKEN_CLASSES': ('api.utils.CustomAccessToken',),
+    'TOKEN_OBTAIN_SERIALIZER': 'api.utils.CustomTokenObtainPairSerializer',
 }
 
 MIDDLEWARE = [

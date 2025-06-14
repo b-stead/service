@@ -4,6 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import validate_email
+import uuid
 
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -58,12 +59,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
-    sub = models.CharField(
-        max_length=255,
-        unique=True,
-        blank=True,
-        null=True,
-    )
+    sub = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     birth_date = models.DateField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     is_active = models.BooleanField(default=True)
