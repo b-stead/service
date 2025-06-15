@@ -41,6 +41,7 @@ class AuthProvider extends ChangeNotifier {
 
     // Update authentication state
     _isAuthenticated = _accessToken != null;
+    print("Authentication state: $_isAuthenticated");
     notifyListeners();
   }
 

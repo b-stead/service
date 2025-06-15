@@ -14,7 +14,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core.custom_api import CustomAPIView
 from .serializers import UserRegistrationSerializer, JobSerializer, QuoteSerializer
 from .authentication import CustomIsAuthenticated
-from .utils import send_activation_email, get_user_from_token, revoke_token, CustomTokenObtainPairSerializer, CustomJWTAuthentication
+from .utils import send_activation_email, get_user_from_token, revoke_token
 
 from jobs.models import Job, Quote
 from django.utils.timezone import now
@@ -24,7 +24,7 @@ from django.contrib.auth import authenticate
 import requests
 import jwt
 from django.conf import settings
-from .auth import authenticate_user, create_access_token, TokenAuthentication
+from .auth import authenticate_user, create_access_token, CustomTokenObtainPairSerializer, CustomJWTAuthentication
 
 User = get_user_model()
 

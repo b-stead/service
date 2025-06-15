@@ -7,8 +7,19 @@ import 'pages/home/home_page.dart';
 import 'pages/jobs/jobs_list.dart';
 import 'pages/jobs/create_job.dart';
 import 'pages/customer/customer_list.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: "assets/.env");
+  } catch (e) {
+    print("Failed to load .env file: $e");
+  }
+
   runApp(
     MultiProvider(
       providers: [

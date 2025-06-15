@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:service_mobile/services/auth_service.dart';
+import 'package:service_mobile/services/job_service.dart';
 
 class JobsPage extends StatefulWidget {
   const JobsPage({Key? key}) : super(key: key);
@@ -9,13 +9,13 @@ class JobsPage extends StatefulWidget {
 }
 
 class _JobsPageState extends State<JobsPage> {
-  final AuthService _authService = AuthService();
+  final JobService _jobService = JobService();
   late Future<List<dynamic>> _jobListFuture;
 
   @override
   void initState() {
     super.initState();
-    _jobListFuture = _authService.fetchJobList(); // Fetch jobs on page load
+    _jobListFuture = _jobService.fetchJobList(); // Fetch jobs on page load
   }
 
   @override

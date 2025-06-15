@@ -6,47 +6,10 @@ from django.contrib.auth import get_user_model
 from smtplib import SMTPException
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.authentication import BaseAuthentication
 from .tokens import BlacklistableAccessToken
 
 User = get_user_model()
-
-class CustomAccessToken(AccessToken):
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.payload['sub'] = str(user.sub)
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-
-        # Generate custom access token
-        refresh = RefreshToken.for_user(self.user)
-        access = CustomAccessToken(self.user)  # Use the custom access token class
-
-        data['refresh'] = str(refresh)
-        data['access'] = str(access)
-        return data
-
-class CustomJWTAuthentication(BaseAuthentication):
-    def authenticate(self, request):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            print("No Authorization header or invalid format")
-            return None
-
-        token = auth_header.split(' ')[1]
-        try:
-            decoded_token = AccessToken(token)
-            sub = decoded_token.get('sub')
-            if not sub:
-                raise Exception("Token does not contain a subject")
-            user = User.objects.get(sub=sub)
-            return (user, None)
-        except Exception as e:
-            print(f"Authentication error: {e}")
-            return None
+        
 def send_activation_email(user):
     """
     Placeholder function to simulate sending an activation email.

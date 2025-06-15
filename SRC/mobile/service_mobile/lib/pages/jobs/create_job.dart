@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:service_mobile/services/auth_service.dart';
+import 'package:service_mobile/services/job_service.dart';
 import 'package:intl/intl.dart';
 
 class CreateJobsPage extends StatefulWidget {
@@ -10,7 +10,7 @@ class CreateJobsPage extends StatefulWidget {
 }
 
 class _CreateJobsPageState extends State<CreateJobsPage> {
-  final AuthService _authService = AuthService();
+  final JobService _jobService = JobService();
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -28,7 +28,7 @@ class _CreateJobsPageState extends State<CreateJobsPage> {
           "start_date": DateTime.now().toIso8601String(), // Example start date
         };
 
-        await _authService.createJob(jobData);
+        await _jobService.createJob(jobData);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Job created successfully")),
