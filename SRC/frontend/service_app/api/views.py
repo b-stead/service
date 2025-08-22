@@ -9,16 +9,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core.custom_api import CustomAPIView
 from .serializers import UserRegistrationSerializer, JobSerializer, QuoteSerializer
 from .authentication import CustomIsAuthenticated
-from .utils import send_activation_email, get_user_from_token, revoke_token, is_token_valid
+from .utils import send_activation_email, get_user_from_token, revoke_token
 
 from jobs.models import Job, Quote
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth import authenticate
+import requests
+import jwt
+from django.conf import settings
+from .auth import authenticate_user, create_access_token, CustomTokenObtainPairSerializer, CustomJWTAuthentication
 
 User = get_user_model()
 
@@ -26,106 +32,111 @@ class RegisterAppUser(GenericAPIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        """
-        Register a new user in the application.
-        """
         email = request.data.get('email', None)
         password = request.data.get('password', None)
         confirm_password = request.data.get('confirm_password', None)
-
-        if email is None or password is None or confirm_password is None:
-            return Response({"data: Missing Data"}, status=status.HTTP_400_BAD_REQUEST)
-
-        data_validation_errors = []
-
+        if not email or not password or not confirm_password:
+            return Response({"error": "Email, password, and confirm_password are required."}, status=status.HTTP_400_BAD_REQUEST)
         if password != confirm_password:
-            data_validation_errors.append("Passwords do not match.")
-
+            return Response({"error": "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            # Validate email format
             validator = EmailValidator()
             validator(email)
         except ValidationError as e:
-            print(e)
-            data_validation_errors.append(e.messages)
-
-        if len(data_validation_errors) > 0:
-            return Response({"data": data_validation_errors}, status=status.HTTP_400_BAD_REQUEST)
+            data_validation_errors = {"email": str(e)}
+            if len(data_validation_errors) > 0:
+                return Response(data_validation_errors, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user = User.objects.create_user(
-                email=email,
-                password=password,
-                is_active=False,
-            )
+            # Create user
+            user = User.objects.create_user(email=email, password=password)
+            user.is_active = False  # Set user as inactive until email is verified
             user.save()
-        
-        except IntegrityError as e:
-            print(e)
-            return Response({"data": "User with this email already exists."}, status=status.HTTP_409_CONFLICT)
-
-        success = send_activation_email(user)
-        if not success:
-            return Response({"data": "Failed to send activation email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response({"data": "User registered successfully. Please check your email to activate your account."}, status=status.HTTP_201_CREATED)
+            # Send activation email
+            send_activation_email(user)
+            return Response({"message": "User registered successfully. Please check your email to activate your account."}, status=status.HTTP_201_CREATED)
+        except IntegrityError:
+            return Response({"error": "User with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
 class ActivateAccount(TemplateView):
-    template_name = 'api/account_activation.html'
+    template_name = 'account_activation.html'    
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        token = kwargs['token']
 
-        if token is None or not is_token_valid(token):
-            context['failed_reason'] = "Invalid or expired token."
+        token = request.GET.get('token', None)
+        if not token:
+            context['error'] = "Activation token is required."
             return self.render_to_response(context)
-
         try:
             user = get_user_from_token(token)
-            # revoke invite token, makes token single use
-            revoke_token(token)
+            revoke_token(token)  # Revoke the token after use
 
+            user.is_active = True
+            user.save()
+            context['message'] = "Your account has been activated successfully."
         except User.DoesNotExist:
-            context['failed_reason'] = "User not found for the provided token."
+            context['error'] = "User not found."
             return self.render_to_response(context)
         
         user.is_active = True
         user.save()
+        context['message'] = "Your account has been activated successfully."
         return self.render_to_response(context)
-    
-    # Generate new tokens for the user
-        # refresh = RefreshToken.for_user(user)
-        # access_token = str(refresh.access_token)
 
-        # # Add tokens to the context for the response
-        # context['access_token'] = access_token
-        # context['refresh_token'] = str(refresh)
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
-        # return self.render_to_response(context)
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        print(response.data)  # Debugging: Print the token payload
+        return response
 
-class LoginDataApi(GenericAPIView):
+class TestAPIView(GenericAPIView):
+    # return a JSON response with a message
+    #permission_classes = [AllowAny]
     def get(self, request):
+
         data = {
-            'message': 'You are logged in!'
+            "message": "This is a test response from the TestAPIView."
         }
-        return JsonResponse(data, status=status.HTTP_200_OK)
-
-class UserRegistrationAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # Validate and create the user
-        user_serializer = UserRegistrationSerializer(data=request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response({"message": "User registered successfully!"}, status=status.HTTP_201_CREATED)
-
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
     
+class LoginAPIView(APIView):
+    """Exchange a valid Google ID token for an access token."""
+    def post(self, request):
+        id_token = request.data.get('id_token')
+        if not id_token:
+            return Response({"detail": "ID token is required."}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            sub = authenticate_user(id_token=id_token)
+        except jwt.exceptions.InvalidTokenError as err:
+            return Response({"detail": f"Invalid ID token: {err}"}, status=status.HTTP_400_BAD_REQUEST)
 
+        if not sub:
+            return Response({"detail": "Invalid ID token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        access_token = create_access_token(data={'sub': sub})
+        return JsonResponse({
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": settings.TOKEN_LIFETIME_SECONDS
+        }, status=status.HTTP_200_OK)
+    
 class JobCreateAPIView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
+        # print(f"Request data: {request.data}")  # Debugging: Log request data
+
         serializer = JobSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(created_by=request.user)  # Save the job with the authenticated user
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # print(f"Serializer errors: {serializer.errors}")  # Debugging: Log serializer errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -147,16 +158,32 @@ class QuoteCreateAPIView(CustomAPIView):
         print(serializer.errors)  # Debugging line to check errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class JobListAPIView(ListAPIView):
-    queryset = Job.objects.all()
+class JobListAPIView(APIView):
     serializer_class = JobSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        # Optionally filter jobs by the currently authenticated user
-        user = self.request.user
-        if user.is_authenticated:
-            return Job.objects.filter(created_by=user, is_deleted=False)
-        return Job.objects.none()
+    def get(self, request, *args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return Response({"error": "Authorization header is missing or invalid"}, status=401)
+
+        token = auth_header.split(' ')[1]
+        try:
+            decoded_token = AccessToken(token)
+            print(f"Decoded token payload: {decoded_token.payload}")  # Debugging: Print the token payload
+
+            sub = decoded_token.get('sub')
+            if not sub:
+                return Response({"error": "Token does not contain a subject"}, status=400)
+
+            # Fetch jobs for the user with the given sub
+            user = request.user
+            jobs = Job.objects.filter(created_by=user, is_deleted=False)
+            serializer = JobSerializer(jobs, many=True)
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            print(f"Error decoding token: {e}")
+            return Response({"error": "Failed to decode token"}, status=400)
     
 class QuoteListAPIView(ListAPIView):
     queryset = Quote.objects.all()

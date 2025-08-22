@@ -3,3 +3,92 @@
 *.env
 
 **__pycache__
+
+# Flutter/Dart/Pub related files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# Build outputs
+build/
+**/build/
+
+# iOS related files
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Flutter/*.xcframework
+ios/Pods/
+ios/.symlinks/
+ios/Runner.xcworkspace
+ios/DerivedData/
+ios/.generated/
+
+# macOS related files
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/Flutter.framework/
+macos/Flutter/Flutter.podspec
+macos/Flutter/*.xcframework
+macos/DerivedData/
+macos/.generated/
+
+# Android related files
+android/.gradle/
+android/app/build/
+android/local.properties
+android/.idea/
+
+# Web related files
+web/.dart_tool/
+web/.flutter-plugins
+web/.flutter-plugins-dependencies
+web/build/
+
+# VS Code related files
+.vscode/
+*.code-workspace
+
+# IntelliJ/Android Studio related files
+.idea/
+*.iml
+
+# Generated files
+*.log
+*.lock
+*.tmp
+*.swp
+
+# Firebase related files (if applicable)
+firebase_app_id_file.json
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+*.class
+*.jar
+*.war
+*.ear
+*.pyc
+*.pyo
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.obj
+*.o
+*.a
+*.lib
+*.ncb
+*.sdf
+*.suo
+*.pdb
+*.idb
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.env

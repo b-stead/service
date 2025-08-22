@@ -3,18 +3,15 @@ from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    path('login/', views.LoginAPIView.as_view(), name='login'),
+
     path('register/', views.RegisterAppUser.as_view(), name='register'),
-    path('activate_account/<str:token>/', views.ActivateAccount.as_view(), name='activate_account'),
-    path('logged_in_data/', views.LoginDataApi.as_view(), name='logged_in_data'),
-
-    path('auth/token/', TokenObtainPairView.as_view()),
-    path('auth/token/refresh/', TokenRefreshView.as_view()),
-
-
-    path('signup/', views.UserRegistrationAPIView.as_view(), name='api_signup'),
-    # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('activate/<str:token>/', views.ActivateAccount.as_view(), name='activate'),
     
+    path('auth/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'), # obtain jwt with email and password
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # refresh expired token
 
+    path('test/', views.TestAPIView.as_view(), name='test'),
     # Jobs
     path('jobs/create/', views.JobCreateAPIView.as_view(), name='job-create'),
     path('quotes/create/', views.QuoteCreateAPIView.as_view(), name='quote-create'),

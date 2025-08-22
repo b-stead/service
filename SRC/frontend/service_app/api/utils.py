@@ -4,12 +4,12 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from smtplib import SMTPException
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from .tokens import BlacklistableAccessToken
 
 User = get_user_model()
-
+        
 def send_activation_email(user):
     """
     Placeholder function to simulate sending an activation email.
@@ -20,7 +20,7 @@ def send_activation_email(user):
         return False
     
     oauth_token = AccessToken.for_user(user)
-    link = settings.BASE_URL + reverse('activate_account', kwargs={'token': str(oauth_token)})
+    link = settings.BASE_URL + reverse('activate', kwargs={'token': str(oauth_token)})
     
     try:
         send_mail(
@@ -44,6 +44,11 @@ def get_user_from_token(token):
         access_token = AccessToken(token)
         user_id = access_token['user_id']
         user = User.objects.get(id=user_id)
+
+        sub = access_token.get('sub')
+        print(f"User sub from token: {sub}")
+        if not sub:
+            raise Exception("Token does not contain a subject")
         return user
     except User.DoesNotExist:
         print("User not found for the provided token.")
