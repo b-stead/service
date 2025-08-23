@@ -5,7 +5,7 @@ docker compose $opts up --detach
 trap "docker compose $opts down" EXIT
 source repository/apply.sh
 echo "apply completed"
-source ../.venv/bin/activate
+source .venv/bin/activate
 echo "Starting backend server..."
 export SECRET_KEY=foo
 export DOCS_PASSWORD=bar
