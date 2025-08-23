@@ -26,7 +26,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/CreateUserResponse"
                 }
               }
             }
@@ -177,6 +177,23 @@
           "last_name"
         ],
         "title": "CreateUserParams"
+      },
+      "CreateUserResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "user"
+        ],
+        "title": "CreateUserResponse"
       },
       "HTTPValidationError": {
         "properties": {

@@ -45,11 +45,12 @@ async def create_user(store: Store, input: queries.CreateUserParams) -> User:
     )
 
 
-@router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: str):
-    """
-    Retrieve a user by ID.
-    """
-    # fetch user from db by user_id
-    user = user_id
-    return {"message": "User fetched successfully", "user": user}
+@router.get("/user/{sub}", status_code=status.HTTP_200_OK)
+async def get_user(store: Store, sub: str) -> User:
+    try:
+        result = await store.get_user_by_sub(sub=sub)
+        assert isinstance(result, models.User)
+        return result
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

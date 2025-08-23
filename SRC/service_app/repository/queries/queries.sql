@@ -13,3 +13,6 @@ VALUES (
     $4,
     $5
 ) RETURNING *;
+
+-- name: GetUserBySub :one
+SELECT * FROM "user" WHERE "sub" = $1;
