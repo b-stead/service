@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# convert optional class members in BaseModel classes to have a default value of None
 import argparse
 import re
 import sys
