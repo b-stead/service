@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../main.dart'; // Import AuthState if needed
+// import 'package:provider/provider.dart';
+// import '../../main.dart'; // Import AuthState if needed
 
 
 class HomePage extends StatelessWidget {
