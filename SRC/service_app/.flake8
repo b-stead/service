@@ -1,0 +1,4 @@
+[flake8]
+exclude = .git,__pycache__,.venv,repository,node_modules,*/migrations/*
+ignore = E501,W503
+indent-size = 4

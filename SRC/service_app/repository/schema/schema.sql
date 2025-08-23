@@ -3,7 +3,7 @@ CREATE TABLE "user" (
     "user_id" text NOT NULL PRIMARY KEY DEFAULT gen_random_uuid()::text,
     "sub" text NOT NULL, -- Identifier from Firebase,
     "email" text NOT NULL,
-    "email_verified" boolean NOT NULL DEFAULT false,
+    "email_verified" boolean NULL DEFAULT false,
     "first_name" text NOT NULL,
     "last_name" text NOT NULL,
     "birthdate" date NULL,

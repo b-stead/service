@@ -2,7 +2,6 @@
 INSERT INTO "user" (
     "sub",
     "email",
-    "email_verified",
     "first_name",
     "last_name",
     "birthdate"
@@ -12,6 +11,5 @@ VALUES (
     $2,
     $3,
     $4,
-    $5,
-    $6
+    $5
 ) RETURNING *;

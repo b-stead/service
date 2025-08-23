@@ -11,7 +11,7 @@ class User(pydantic.BaseModel):
     user_id: str
     sub: str
     email: str
-    email_verified: bool
+    email_verified: Optional[bool] = None
     first_name: str
     last_name: str
     birthdate: Optional[datetime.date] = None

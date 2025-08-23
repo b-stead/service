@@ -17,7 +17,6 @@ CREATE_USER = """-- name: create_user \\:one
 INSERT INTO "user" (
     "sub",
     "email",
-    "email_verified",
     "first_name",
     "last_name",
     "birthdate"
@@ -27,8 +26,7 @@ VALUES (
     :p2,
     :p3,
     :p4,
-    :p5,
-    :p6
+    :p5
 ) RETURNING user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at
 """
 
@@ -36,7 +34,6 @@ VALUES (
 class CreateUserParams(pydantic.BaseModel):
     sub: str
     email: str
-    email_verified: bool
     first_name: str
     last_name: str
     birthdate: Optional[datetime.date] = None
@@ -50,10 +47,9 @@ class AsyncQuerier:
         row = (await self._conn.execute(sqlalchemy.text(CREATE_USER), {
             "p1": arg.sub,
             "p2": arg.email,
-            "p3": arg.email_verified,
-            "p4": arg.first_name,
-            "p5": arg.last_name,
-            "p6": arg.birthdate,
+            "p3": arg.first_name,
+            "p4": arg.last_name,
+            "p5": arg.birthdate,
         })).first()
         if row is None:
             return None
