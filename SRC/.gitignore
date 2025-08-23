@@ -88,7 +88,6 @@ Thumbs.db
 *.pdb
 *.idb
 *.log
-*.sql
 *.sqlite
 *.sqlite3
 *.env
