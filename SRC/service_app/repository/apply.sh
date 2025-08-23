@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # stop on error
 # Run from the base directory, not from repository
-url="postgresql://postgres:password@localhost:5433/service_app?sslmode=disable"
+url="postgresql://postgres:password@localhost:5432/postgres?sslmode=disable"
 echo -n "waiting for backend database to be ready ..."
 iteration=0
 timeout=30
@@ -22,8 +22,8 @@ done
 echo " ok"
 atlas schema apply --auto-approve \
   --url $url \
-  --to file://schema/schema.sql \
-  --dev-url "postgresql://postgres:password@localhost:5433/service_app?sslmode=disable" > /dev/null
+  --to file://repository/schema/schema.sql \
+  --dev-url "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable" > /dev/null
 
 # psql -v ON_ERROR_STOP=1 --file="testdata/generated.sql" $url > /dev/null
-psql -v ON_ERROR_STOP=1 --file="testdata/testdata.sql" $url > /dev/null
+psql -v ON_ERROR_STOP=1 --file="repository/testdata/testdata.sql" $url > /dev/null

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from backend.repository import queries, models
-from backend.db import Store
+from repository import queries, models
+from db import Store
 import structlog
 from pydantic import BaseModel
 
