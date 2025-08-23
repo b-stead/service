@@ -1,21 +1,13 @@
-backend-db-1  | The files belonging to this database system will be owned by user "postgres".
-backend-db-1  | This user must also own the server process.
-backend-db-1  | 
-backend-db-1  | The database cluster will be initialized with locale "en_US.utf8".
-backend-db-1  | The default database encoding has accordingly been set to "UTF8".
-backend-db-1  | The default text search configuration will be set to "english".
-backend-db-1  | 
-backend-db-1  | Data page checksums are disabled.
-backend-db-1  | 
-backend-db-1  | fixing permissions on existing directory /var/lib/postgresql/data ... ok
-backend-db-1  | creating subdirectories ... ok
-backend-db-1  | selecting dynamic shared memory implementation ... posix
-backend-db-1  | selecting default max_connections ... 100
-backend-db-1  | selecting default shared_buffers ... 128MB
-backend-db-1  | selecting default time zone ... Etc/UTC
-backend-db-1  | creating configuration files ... ok
-backend-db-1  | running bootstrap script ... ok
-backend-1     | Usage: uvicorn [OPTIONS] APP
-backend-1     | Try 'uvicorn --help' for help.
-backend-1     | 
-backend-1     | Error: Invalid value for '--log-config': Path 'backend/uvicorn_log_config.yaml' does not exist.
+fastapi-app  | INFO:     Started server process [1]
+fastapi-app  | INFO:     Waiting for application startup.
+fastapi-app  | INFO:     Application startup complete.
+fastapi-app  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+postgres-db  | 
+postgres-db  | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres-db  | 
+postgres-db  | 2025-08-23 23:28:31.458 UTC [1] LOG:  starting PostgreSQL 16.10 (Debian 16.10-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+postgres-db  | 2025-08-23 23:28:31.458 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres-db  | 2025-08-23 23:28:31.458 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres-db  | 2025-08-23 23:28:31.461 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres-db  | 2025-08-23 23:28:31.463 UTC [28] LOG:  database system was shut down at 2025-08-23 23:26:08 UTC
+postgres-db  | 2025-08-23 23:28:31.465 UTC [1] LOG:  database system is ready to accept connections

@@ -1,0 +1,12 @@
+services:
+  backend-db:
+    image: postgres:16
+    command:
+    - -c
+    - log_connections=true
+    restart: always
+    shm_size: 256mb
+    ports:
+    - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: password

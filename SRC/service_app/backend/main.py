@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 
-from routers import user
+from backend.routers import user
 app = FastAPI(
     title="Service App",
 )

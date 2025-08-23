@@ -23,7 +23,6 @@ echo " ok"
 atlas schema apply --auto-approve \
   --url $url \
   --to file://repository/schema/schema.sql \
-  --dev-url "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable" > /dev/null
-
-# psql -v ON_ERROR_STOP=1 --file="testdata/generated.sql" $url > /dev/null
+  --dev-url "docker://postgres/16" > /dev/null
+# psql -v ON_ERROR_STOP=1 --file="repository/testdata/generated.sql" $url > /dev/null
 psql -v ON_ERROR_STOP=1 --file="repository/testdata/testdata.sql" $url > /dev/null

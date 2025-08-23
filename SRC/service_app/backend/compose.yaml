@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: backend
+    pull_policy: build
+    ports:
+    - '8000:8000'
+    environment:
+      POSTGRES_HOST: backend-db
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: postgres
+      POSTGRES_SSLMODE: disable
+      SECRET_KEY: foo
+      DOCS_USERNAME: docs
+      DOCS_PASSWORD: bar
+      LOG_STYLE: ${LOG_STYLE:-json}

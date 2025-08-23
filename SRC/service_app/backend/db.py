@@ -2,9 +2,9 @@ from typing import Annotated, Any
 from collections.abc import AsyncGenerator
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
-from repository import queries
+from backend.repository import queries
 from fastapi import Depends
-from config import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DATABASE, POSTGRES_SSLMODE
+from backend.config import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DATABASE, POSTGRES_SSLMODE
 
 
 class PostgresDatabase:
@@ -17,6 +17,7 @@ class PostgresDatabase:
 
 
 database: PostgresDatabase = PostgresDatabase()
+print(f"Database URL: {database.url}")
 
 
 async def get_store() -> AsyncGenerator[Any, Any]:
