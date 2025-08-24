@@ -22,7 +22,7 @@ jobs:
             - uses: ariga/setup-atlas@v0
             - name: pip install
               run: |
-                pip install -r requirements.txt
+                pip install -r SRC/service_app/requirements.txt
             - name: flake8
               run: |
                 flake8 backend
