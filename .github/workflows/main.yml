@@ -19,7 +19,7 @@ jobs:
             - uses: actions/setup-python@v5
               with:
                 python-version: '3.12'
-            - uses: ariga/setup-atlasv0
+            - uses: ariga/setup-atlas@v0
             - name: pip install
               run: |
                 pip install -r requirements.txt
