@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("jobs", "0003_job_deleted_date_job_is_deleted_quote_deleted_date_and_more"),
     ]

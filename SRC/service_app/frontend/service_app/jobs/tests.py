@@ -5,10 +5,13 @@ from jobs.models import Job, Quote
 
 User = get_user_model()
 
+
 class JobModelTest(TestCase):
     def setUp(self):
         # Create a user
-        self.user = User.objects.create_user(email="testuser@example.com", password="password123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password123"
+        )
 
         # Create a customer
         self.customer = Customer.objects.create(
@@ -17,7 +20,7 @@ class JobModelTest(TestCase):
             email="john.doe@example.com",
             phone="1234567890",
             created_by=self.user,
-            updated_by=self.user
+            updated_by=self.user,
         )
 
     def test_create_standalone_job(self):
@@ -28,7 +31,7 @@ class JobModelTest(TestCase):
             customer=self.customer,
             created_by=self.user,
             start_date="2023-10-01",
-            recurrence="none"
+            recurrence="none",
         )
         self.assertEqual(job.title, "Fix Plumbing")
         self.assertFalse(job.is_recurring())
@@ -42,7 +45,7 @@ class JobModelTest(TestCase):
             created_by=self.user,
             start_date="2023-10-01",
             recurrence="weekly",
-            recurrence_interval=1
+            recurrence_interval=1,
         )
         self.assertEqual(job.title, "Weekly Lawn Mowing")
         self.assertTrue(job.is_recurring())
@@ -53,7 +56,9 @@ class JobModelTest(TestCase):
 class QuoteModelTest(TestCase):
     def setUp(self):
         # Create a user
-        self.user = User.objects.create_user(email="testuser@example.com", password="password123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password123"
+        )
 
         # Create a customer
         self.customer = Customer.objects.create(
@@ -62,7 +67,7 @@ class QuoteModelTest(TestCase):
             email="john.doe@example.com",
             phone="1234567890",
             created_by=self.user,
-            updated_by=self.user
+            updated_by=self.user,
         )
 
         # Create a job
@@ -71,7 +76,7 @@ class QuoteModelTest(TestCase):
             description="Fix the leaking sink in the kitchen.",
             customer=self.customer,
             created_by=self.user,
-            start_date="2023-10-01"
+            start_date="2023-10-01",
         )
 
     def test_create_quote(self):
@@ -82,7 +87,7 @@ class QuoteModelTest(TestCase):
             customer=self.customer,
             job=self.job,
             created_by=self.user,
-            total_price=250.00
+            total_price=250.00,
         )
         self.assertEqual(quote.title, "Plumbing Work")
         self.assertEqual(quote.customer, self.customer)
@@ -96,7 +101,7 @@ class QuoteModelTest(TestCase):
             title="Plumbing Work",
             customer=self.customer,
             created_by=self.user,
-            total_price=250.00
+            total_price=250.00,
         )
         quote.status = Quote.Status.ACCEPTED
         quote.save()

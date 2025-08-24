@@ -4,6 +4,7 @@ from .models import Customer
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+
 @csrf_exempt
 def create_customer(request):
     if request.method == "POST":
@@ -17,6 +18,7 @@ def create_customer(request):
         )
         return JsonResponse({"id": customer.id, "name": customer.name}, status=201)
 
+
 @csrf_exempt
 def update_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id, user=request.user)
@@ -28,6 +30,7 @@ def update_customer(request, customer_id):
         customer.address = data.get("address", customer.address)
         customer.save()
         return JsonResponse({"id": customer.id, "name": customer.name}, status=200)
+
 
 @csrf_exempt
 def delete_customer(request, customer_id):

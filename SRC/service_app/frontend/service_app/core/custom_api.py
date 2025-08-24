@@ -8,7 +8,8 @@ from datetime import datetime, timedelta, timezone
 from django.conf import settings
 
 User = get_user_model()
-    
+
+
 class CustomAPIView(APIView):
     """
     Custom APIView that handles authorization using a 'sub' token.
@@ -22,7 +23,10 @@ class CustomAPIView(APIView):
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
             print("Authorization header is missing or invalid.")
-            return None, Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+            return None, Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         token = auth_header.split(" ")[1]  # Extract the token
         try:
@@ -33,27 +37,38 @@ class CustomAPIView(APIView):
             print(f"Token decoded successfully. 'sub' value: {sub}")
             if not sub:
                 print("Token is invalid: 'sub' not found.")
-                return None, Response({"detail": "Invalid token: 'sub' not found."}, status=status.HTTP_401_UNAUTHORIZED)
+                return None, Response(
+                    {"detail": "Invalid token: 'sub' not found."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             # Check token expiration
             exp = payload.get("exp")
-            if exp and datetime.fromtimestamp(exp, tz=timezone.utc) < datetime.now(timezone.utc):
+            if exp and datetime.fromtimestamp(exp, tz=timezone.utc) < datetime.now(
+                timezone.utc
+            ):
                 print("Token has expired. Generating a new token...")
                 # Token is expired, create a new expiration time
                 new_exp = datetime.now() + timedelta(minutes=1)
                 payload["exp"] = int(new_exp.timestamp())
                 new_token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
                 print("New token generated successfully.")
-                return sub, {"new_token": new_token}  # Return the new token for the client
+                return sub, {
+                    "new_token": new_token
+                }  # Return the new token for the client
 
             print("Token is valid.")
             return sub, None
         except jwt.ExpiredSignatureError:
             print("Token has expired.")
-            return None, Response({"detail": "Token has expired."}, status=status.HTTP_401_UNAUTHORIZED)
+            return None, Response(
+                {"detail": "Token has expired."}, status=status.HTTP_401_UNAUTHORIZED
+            )
         except jwt.InvalidTokenError:
             print("Token is invalid.")
-            return None, Response({"detail": "Invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+            return None, Response(
+                {"detail": "Invalid token."}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
     def authenticate_user(self, sub):
         """
@@ -95,11 +110,15 @@ class CustomAPIView(APIView):
         if not user:
             print(f"User with sub '{sub}' not found. Returning 401 response.")
             self.headers = {}
-            response = Response({"detail": "Invalid user."}, status=status.HTTP_401_UNAUTHORIZED)
+            response = Response(
+                {"detail": "Invalid user."}, status=status.HTTP_401_UNAUTHORIZED
+            )
             return self.finalize_response(request, response, *args, **kwargs)
 
         # Attach the user to the request
-        print(f"User authenticated successfully. Attaching user '{user}' to the request.")
+        print(
+            f"User authenticated successfully. Attaching user '{user}' to the request."
+        )
         request.user = user
 
         # If a new token was generated, include it in the response headers

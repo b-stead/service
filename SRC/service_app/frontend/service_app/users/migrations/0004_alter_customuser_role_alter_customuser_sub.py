@@ -3,8 +3,8 @@
 import uuid
 from django.db import migrations, models
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
         ("users", "0003_customuser_birth_date_customuser_phone_number_and_more"),
     ]

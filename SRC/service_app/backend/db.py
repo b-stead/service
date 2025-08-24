@@ -4,7 +4,14 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from backend.repository import queries
 from fastapi import Depends
-from backend.config import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DATABASE, POSTGRES_SSLMODE
+from backend.config import (
+    POSTGRES_USERNAME,
+    POSTGRES_PASSWORD,
+    POSTGRES_HOST,
+    POSTGRES_PORT,
+    POSTGRES_DATABASE,
+    POSTGRES_SSLMODE,
+)
 
 
 class PostgresDatabase:
@@ -12,7 +19,11 @@ class PostgresDatabase:
     engine: AsyncEngine
 
     def __init__(self) -> None:
-        self.url = f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DATABASE}?ssl={POSTGRES_SSLMODE}"
+        self.url = f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}\
+            @{POSTGRES_HOST}:\
+            {POSTGRES_PORT}\
+            /{POSTGRES_DATABASE}\
+            ?ssl={POSTGRES_SSLMODE}"
         self.engine = create_async_engine(url=self.url)
 
 

@@ -11,9 +11,12 @@ from datetime import datetime, timedelta
 
 User = get_user_model()
 
+
 class JobCreateAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.customer = Customer.objects.create(first_name="Test Customer")
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.job_create_url = "/api/jobs/create/"
@@ -24,16 +27,21 @@ class JobCreateAPITestCase(APITestCase):
             "description": "This is a test job.",
             "start_date": "2023-10-01",
             "customer": self.customer.id,
-            "status": "pending"
+            "status": "pending",
         }
         response = self.client.post(self.job_create_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Job.objects.count(), 1)
         self.assertEqual(Job.objects.first().title, "Test Job")
 
+
 class QuoteCreateAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123", sub="somerandomstring")
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password="securepassword123",
+            sub="somerandomstring",
+        )
         self.customer = Customer.objects.create(first_name="Test Customer")
         self.quote_create_url = "/api/quotes/create/"
 
@@ -41,10 +49,11 @@ class QuoteCreateAPITestCase(APITestCase):
         self.sub_token = jwt.encode(
             {
                 "sub": "somerandomstring",  # The unique identifier for the user
-                "exp": datetime.utcnow() + timedelta(minutes=5)  # Token expires in 5 minutes
+                "exp": datetime.utcnow()
+                + timedelta(minutes=5),  # Token expires in 5 minutes
             },
             settings.SECRET_KEY,  # Use the same secret key as your application
-            algorithm="HS256"  # Use the same algorithm as your application
+            algorithm="HS256",  # Use the same algorithm as your application
         )
 
     def test_create_quote(self):
@@ -53,12 +62,16 @@ class QuoteCreateAPITestCase(APITestCase):
             "description": "This is a test quote.",
             "customer": self.customer.id,
             "status": "draft",
-            "total_price": "100.00"
+            "total_price": "100.00",
         }
         # Include the Authorization header with the encoded JWT token
         headers = {"HTTP_AUTHORIZATION": f"Bearer {self.sub_token}"}
-        response = self.client.post(self.quote_create_url, data, format="json", **headers)
-        print("Response data:", getattr(response, "data", response.content))  # Debugging line
+        response = self.client.post(
+            self.quote_create_url, data, format="json", **headers
+        )
+        print(
+            "Response data:", getattr(response, "data", response.content)
+        )  # Debugging line
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Quote.objects.count(), 1)
         self.assertEqual(Quote.objects.first().title, "Test Quote")
@@ -66,41 +79,82 @@ class QuoteCreateAPITestCase(APITestCase):
 
 class JobListAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.job1 = Job.objects.create(title="Job 1", customer=self.customer, created_by=self.user, start_date="2023-10-01")
-        self.job2 = Job.objects.create(title="Job 2", customer=self.customer, created_by=self.user, start_date="2023-10-02", is_deleted=True)
+        self.job1 = Job.objects.create(
+            title="Job 1",
+            customer=self.customer,
+            created_by=self.user,
+            start_date="2023-10-01",
+        )
+        self.job2 = Job.objects.create(
+            title="Job 2",
+            customer=self.customer,
+            created_by=self.user,
+            start_date="2023-10-02",
+            is_deleted=True,
+        )
         self.job_list_url = "/api/jobs/"
 
     def test_list_jobs(self):
         response = self.client.get(self.job_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Job 1")
+        self.assertEqual(response.data[0]["title"], "Job 1")
+
 
 class QuoteListAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.quote1 = Quote.objects.create(title="Quote 1", customer=self.customer, created_by=self.user, total_price="100.00")
-        self.quote2 = Quote.objects.create(title="Quote 2", customer=self.customer, created_by=self.user, total_price="100.00", is_deleted=True)
+        self.quote1 = Quote.objects.create(
+            title="Quote 1",
+            customer=self.customer,
+            created_by=self.user,
+            total_price="100.00",
+        )
+        self.quote2 = Quote.objects.create(
+            title="Quote 2",
+            customer=self.customer,
+            created_by=self.user,
+            total_price="100.00",
+            is_deleted=True,
+        )
         self.quote_list_url = "/api/quotes/"
 
     def test_list_quotes(self):
         response = self.client.get(self.quote_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Quote 1")
+        self.assertEqual(response.data[0]["title"], "Quote 1")
+
 
 class JobUpdateAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.job = Job.objects.create(title="Job 1", customer=self.customer, created_by=self.user, start_date="2023-10-01")
-        self.job2 = Job.objects.create(title="Job 2", customer=self.customer, created_by=self.user, start_date="2023-10-01", is_deleted=True)
+        self.job = Job.objects.create(
+            title="Job 1",
+            customer=self.customer,
+            created_by=self.user,
+            start_date="2023-10-01",
+        )
+        self.job2 = Job.objects.create(
+            title="Job 2",
+            customer=self.customer,
+            created_by=self.user,
+            start_date="2023-10-01",
+            is_deleted=True,
+        )
         self.job2.deleted_date = now()
         self.job2.save()
         self.job_update_url = f"/api/jobs/{self.job.id}/update/"
@@ -123,9 +177,7 @@ class JobUpdateAPITestCase(APITestCase):
         self.job.is_deleted = True
         self.job.deleted_date = now()
         self.job.save()
-        data = {
-            "title": "Job 1"
-        }
+        data = {"title": "Job 1"}
         response = self.client.put(self.job_update_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "Cannot update a deleted job.")
@@ -133,17 +185,24 @@ class JobUpdateAPITestCase(APITestCase):
 
 class QuoteUpdateAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.quote = Quote.objects.create(title="Quote 1", customer=self.customer, created_by=self.user, total_price="100.00")
+        self.quote = Quote.objects.create(
+            title="Quote 1",
+            customer=self.customer,
+            created_by=self.user,
+            total_price="100.00",
+        )
         self.quote_update_url = f"/api/quotes/{self.quote.id}/update/"
 
     def test_update_quote(self):
         data = {
             "title": "Updated Quote Title",
             "description": "Updated description.",
-            "total_price": "150.00"
+            "total_price": "150.00",
         }
         response = self.client.put(self.quote_update_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -156,19 +215,25 @@ class QuoteUpdateAPITestCase(APITestCase):
         self.quote.is_deleted = True
         self.quote.deleted_date = now()
         self.quote.save()
-        data = {
-            "title": "Updated Quote Title"
-        }
+        data = {"title": "Updated Quote Title"}
         response = self.client.put(self.quote_update_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "No Quote matches the given query.")
 
+
 class JobDeleteAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.job = Job.objects.create(title="Job 1", customer=self.customer, created_by=self.user, start_date="2023-10-01")
+        self.job = Job.objects.create(
+            title="Job 1",
+            customer=self.customer,
+            created_by=self.user,
+            start_date="2023-10-01",
+        )
         self.job_delete_url = f"/api/jobs/{self.job.id}/delete/"
 
     def test_delete_job(self):
@@ -186,10 +251,17 @@ class JobDeleteAPITestCase(APITestCase):
 
 class QuoteDeleteAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
-        self.quote = Quote.objects.create(title="Quote 1", customer=self.customer, created_by=self.user, total_price="100.00")
+        self.quote = Quote.objects.create(
+            title="Quote 1",
+            customer=self.customer,
+            created_by=self.user,
+            total_price="100.00",
+        )
         self.quote_delete_url = f"/api/quotes/{self.quote.id}/delete/"
 
     def test_delete_quote(self):
@@ -204,9 +276,12 @@ class QuoteDeleteAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["error"], "Quote not found or already deleted.")
 
+
 class AgreeQuoteAPITestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="securepassword123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="securepassword123"
+        )
         self.client.login(email="testuser@example.com", password="securepassword123")
         self.customer = Customer.objects.create(first_name="Test Customer")
         self.quote = Quote.objects.create(
@@ -215,7 +290,7 @@ class AgreeQuoteAPITestCase(APITestCase):
             total_price="100.00",
             customer=self.customer,
             created_by=self.user,
-            status=Quote.Status.SENT
+            status=Quote.Status.SENT,
         )
         self.agree_quote_url = f"/api/quotes/{self.quote.id}/agree/"
 
@@ -232,9 +307,15 @@ class AgreeQuoteAPITestCase(APITestCase):
         self.quote.save()
         response = self.client.post(self.agree_quote_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["error"], "This quote has already been accepted or is not in a valid state to be accepted.")
+        self.assertEqual(
+            response.data["error"],
+            "This quote has already been accepted or is not in a valid state to be accepted.",
+        )
 
     def test_agree_nonexistent_quote(self):
         response = self.client.post("/api/quotes/999/agree/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data["error"], "Quote not found or not in a valid state to be accepted.")
+        self.assertEqual(
+            response.data["error"],
+            "Quote not found or not in a valid state to be accepted.",
+        )

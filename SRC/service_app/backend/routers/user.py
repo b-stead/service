@@ -23,14 +23,16 @@ async def create_user(store: Store, input: queries.CreateUserParams) -> User:
     """
     try:
         # username: models.Username = await assign_username(store)
-        result = await store.create_user(queries.CreateUserParams(
-            sub=input.sub,
-            # username=username.username,
-            email=input.email,
-            first_name=input.first_name,
-            last_name=input.last_name,
-            birthdate=input.birthdate
-        ))
+        result = await store.create_user(
+            queries.CreateUserParams(
+                sub=input.sub,
+                # username=username.username,
+                email=input.email,
+                first_name=input.first_name,
+                last_name=input.last_name,
+                birthdate=input.birthdate,
+            )
+        )
         assert isinstance(result, models.User)
     except IntegrityError as err:
         logger.warning(f"action blocked by database integrity error: {err}")
@@ -39,10 +41,7 @@ async def create_user(store: Store, input: queries.CreateUserParams) -> User:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return CreateUserResponse(
-        message="User created successfully",
-        user=result
-    )
+    return CreateUserResponse(message="User created successfully", user=result)
 
 
 @router.get("/user/{sub}", status_code=status.HTTP_200_OK)

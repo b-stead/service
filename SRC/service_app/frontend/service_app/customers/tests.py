@@ -6,10 +6,13 @@ from customers.models import Address
 
 User = get_user_model()
 
+
 class CustomerModelTest(TestCase):
     def setUp(self):
         # Create a user
-        self.user = User.objects.create_user(email="testuser@example.com", password="password123")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password123"
+        )
 
         # Create a company
         self.company = Company.objects.create(name="Test Company", owner=self.user)
@@ -20,7 +23,7 @@ class CustomerModelTest(TestCase):
             city="Test City",
             state="Test State",
             postal_code="12345",
-            country="Test Country"
+            country="Test Country",
         )
 
         # Create a customer
@@ -32,7 +35,7 @@ class CustomerModelTest(TestCase):
             address=self.address,
             company=self.company,
             created_by=self.user,
-            updated_by=self.user
+            updated_by=self.user,
         )
 
     def test_customer_creation(self):
@@ -69,7 +72,7 @@ class CustomerModelTest(TestCase):
             phone="9876543210",
             company=self.company,
             created_by=self.user,
-            updated_by=self.user
+            updated_by=self.user,
         )
         self.assertIsNone(customer_without_address.address)
         self.assertEqual(customer_without_address.company, self.company)
@@ -83,7 +86,7 @@ class CustomerModelTest(TestCase):
             phone="5555555555",
             address=self.address,
             created_by=self.user,
-            updated_by=self.user
+            updated_by=self.user,
         )
         self.assertIsNone(customer_without_company.company)
         self.assertEqual(customer_without_company.address, self.address)

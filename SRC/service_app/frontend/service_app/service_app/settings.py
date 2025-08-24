@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,43 +43,40 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "api",
     "core",
     "users",
     "customers",
     "jobs",
-
     "rest_framework",
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Ensure all API views require authentication
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",  # Ensure all API views require authentication
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'api.auth.CustomJWTAuthentication',  # Use JWT authentication
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "api.auth.CustomJWTAuthentication",  # Use JWT authentication
     ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',  # Default renderer for API responses
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",  # Default renderer for API responses
     ],
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Short-lived access token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Long-lived refresh token
-    'ROTATE_REFRESH_TOKENS': True,                  # Issue a new refresh token on refresh
-    'BLACKLIST_AFTER_ROTATION': True,               # Blacklist old refresh tokens
-    'AUTH_HEADER_TYPES': ('Bearer',),               # Use "Bearer" prefix for tokens
-    'AUTH_TOKEN_CLASSES': ('api.auth.CustomAccessToken',),
-    'TOKEN_OBTAIN_SERIALIZER': 'api.auth.CustomTokenObtainPairSerializer',
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Short-lived access token
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Long-lived refresh token
+    "ROTATE_REFRESH_TOKENS": True,  # Issue a new refresh token on refresh
+    "BLACKLIST_AFTER_ROTATION": True,  # Blacklist old refresh tokens
+    "AUTH_HEADER_TYPES": ("Bearer",),  # Use "Bearer" prefix for tokens
+    "AUTH_TOKEN_CLASSES": ("api.auth.CustomAccessToken",),
+    "TOKEN_OBTAIN_SERIALIZER": "api.auth.CustomTokenObtainPairSerializer",
 }
 
 MIDDLEWARE = [
@@ -89,7 +87,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
     "allauth.account.middleware.AccountMiddleware",
 ]
 
@@ -105,7 +102,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'django.template.context_processors.request',
+                "django.template.context_processors.request",
             ],
         },
     },
@@ -168,48 +165,46 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
 SITE_ID = 1
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.getenv('SERV_GOOGLE_CLIENT_ID'),
-            'secret': os.getenv('SERV_GOOGLE_CLIENT_SECRET'),
-            'key': ''
+    "google": {
+        "APP": {
+            "client_id": os.getenv("SERV_GOOGLE_CLIENT_ID"),
+            "secret": os.getenv("SERV_GOOGLE_CLIENT_SECRET"),
+            "key": "",
         }
     },
 }
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-
+    "django.contrib.auth.backends.ModelBackend",
     # `allauth` specific authentication methods, such as login by email
-    'allauth.account.auth_backends.AuthenticationBackend',
-
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_LOGIN_METHODS = {"email"}
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_SIGNUP_REDIRECT_URL = 'account_login'
+ACCOUNT_SIGNUP_REDIRECT_URL = "account_login"
 # ACCOUNT_ADAPTER = 'users.adapter.CustomAccountAdapter'
 # SOCIALACCOUNT_ADAPTER = 'users.adapter.CustomSocialAccountAdapter'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 TOKEN_LIFETIME_SECONDS = 3600  # Access token lifetime (1 hour)
-TOKEN_LEEWAY_SECONDS = 60      # Leeway for token expiration
+TOKEN_LEEWAY_SECONDS = 60  # Leeway for token expiration
 TOKEN_ISSUER = "https://accounts.google.com"
 TOKEN_AUDIENCE = "your_google_client_id.apps.googleusercontent.com"

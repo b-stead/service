@@ -9,7 +9,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from .tokens import BlacklistableAccessToken
 
 User = get_user_model()
-        
+
+
 def send_activation_email(user):
     """
     Placeholder function to simulate sending an activation email.
@@ -18,14 +19,14 @@ def send_activation_email(user):
     """
     if user.email is None:
         return False
-    
+
     oauth_token = AccessToken.for_user(user)
-    link = settings.BASE_URL + reverse('activate', kwargs={'token': str(oauth_token)})
-    
+    link = settings.BASE_URL + reverse("activate", kwargs={"token": str(oauth_token)})
+
     try:
         send_mail(
-            subject='Activate your account',
-            message=f'Please click the link to activate your account: {link}',
+            subject="Activate your account",
+            message=f"Please click the link to activate your account: {link}",
             from_email=settings.EMAIL_HOST_USER,  # Correct placement of from_email
             recipient_list=[user.email],
             fail_silently=False,
@@ -36,16 +37,17 @@ def send_activation_email(user):
     print(f"Activation email sent to {user.email}")
     return True
 
+
 def get_user_from_token(token):
     """
     Retrieve the user associated with the given token.
     """
     try:
         access_token = AccessToken(token)
-        user_id = access_token['user_id']
+        user_id = access_token["user_id"]
         user = User.objects.get(id=user_id)
 
-        sub = access_token.get('sub')
+        sub = access_token.get("sub")
         print(f"User sub from token: {sub}")
         if not sub:
             raise Exception("Token does not contain a subject")
@@ -56,13 +58,15 @@ def get_user_from_token(token):
     except Exception as e:
         print(f"Unexpected error: {e}")
         return None
-    
+
+
 def revoke_token(token):
     """
     Revoke the given token by blacklisting it.
     """
     access_token = BlacklistableAccessToken(token)
     access_token.blacklist()
+
 
 def is_token_valid(token):
     """
