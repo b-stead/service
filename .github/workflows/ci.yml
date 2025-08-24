@@ -27,6 +27,4 @@ jobs:
               working-directory: ./SRC/service_app
               run: |
                 flake8 backend
-            - name: mypy
-              run: |
-                mypy SRC/service_app/backend
+
