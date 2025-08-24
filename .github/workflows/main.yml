@@ -24,7 +24,7 @@ jobs:
               run: |
                 pip install -r SRC/service_app/requirements.txt
             - name: flake8
-              working-directory: ./service_app
+              working-directory: ./SRC/service_app
               run: |
                 flake8 backend
             - name: mypy
