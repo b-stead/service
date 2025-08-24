@@ -17,7 +17,7 @@ class UserRegistrationAPITestCase(APITestCase):
             "username": "testuser1",
             "email": "testuser1@example.com",
             "password": "securepassword123",
-            "is_company": False
+            "is_company": False,
         }
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -31,14 +31,16 @@ class UserRegistrationAPITestCase(APITestCase):
             "email": "testuser2@example.com",
             "password": "securepassword123",
             "is_company": True,
-            "company_name": "Test Company"
+            "company_name": "Test Company",
         }
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(Company.objects.count(), 1)
         company = Company.objects.first()
-        self.assertEqual(company.name, "test company")  # Ensure company name is normalized
+        self.assertEqual(
+            company.name, "test company"
+        )  # Ensure company name is normalized
         self.assertEqual(company.owner.email, "testuser2@example.com")
 
     def test_user_registration_with_missing_company_name(self):
@@ -47,7 +49,7 @@ class UserRegistrationAPITestCase(APITestCase):
             "username": "testuser3",
             "email": "testuser3@example.com",
             "password": "securepassword123",
-            "is_company": True
+            "is_company": True,
         }
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -60,7 +62,7 @@ class UserRegistrationAPITestCase(APITestCase):
             email="existinguser@example.com",
             password="securepassword123",
             first_name="Existing",
-            last_name="User"
+            last_name="User",
         )
         Company.objects.create(name="duplicate company", owner=user)
 
@@ -70,12 +72,14 @@ class UserRegistrationAPITestCase(APITestCase):
             "email": "testuser4@example.com",
             "password": "securepassword123",
             "is_company": True,
-            "company_name": "Duplicate Company"
+            "company_name": "Duplicate Company",
         }
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("company_name", response.data)
-        self.assertEqual(response.data["company_name"], "A company with this name already exists.")
+        self.assertEqual(
+            response.data["company_name"], "A company with this name already exists."
+        )
 
     def test_user_registration_with_existing_email(self):
         """Test registering a user with an email that already exists"""
@@ -83,13 +87,13 @@ class UserRegistrationAPITestCase(APITestCase):
             email="duplicateemail@example.com",
             password="securepassword123",
             first_name="Existing",
-            last_name="User"
+            last_name="User",
         )
         data = {
             "username": "testuser5",
             "email": "duplicateemail@example.com",
             "password": "securepassword123",
-            "is_company": False
+            "is_company": False,
         }
         response = self.client.post(self.signup_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

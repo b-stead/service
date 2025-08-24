@@ -4,7 +4,6 @@ from .models import CustomUser, Company
 # FILE: SRC/serv_app/frontend/serv_app/serv_app/test_settings.py
 
 
-
 class CustomUserModelTests(TestCase):
     def test_create_regular_user(self):
         """Test creating a regular user."""

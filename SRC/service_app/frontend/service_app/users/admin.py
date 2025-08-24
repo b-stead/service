@@ -4,12 +4,15 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import CustomUser
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
 
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput)
+    password2 = forms.CharField(
+        label="Password confirmation", widget=forms.PasswordInput
+    )
 
     class Meta:
         model = CustomUser
@@ -56,7 +59,8 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
-    
+
+
 # Register your models here.
 class UserAdmin(BaseUserAdmin):
     # change_list_template = "admin/web_users_change_list.html"
@@ -67,7 +71,13 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ("email", "is_superuser", "is_staff", "role", "sub",)
+    list_display = (
+        "email",
+        "is_superuser",
+        "is_staff",
+        "role",
+        "sub",
+    )
     list_filter = ("is_superuser", "is_staff")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -83,10 +93,12 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    readonly_fields = ("sub",) 
+    readonly_fields = ("sub",)
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
-    add_fieldsets = ((None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),)
+    add_fieldsets = (
+        (None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),
+    )
     search_fields = ("email",)
     ordering = ("email",)
     filter_horizontal = ()

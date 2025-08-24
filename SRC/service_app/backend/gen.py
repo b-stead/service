@@ -15,7 +15,9 @@ spec = get_openapi(
 #     spec["paths"][path][verb]["responses"] = {k: v for k, v in spec["paths"][path][verb]["responses"].items() if k not in ["422"]}
 # spec["components"]["schemas"] = {k: v for k, v in spec["components"]["schemas"].items() if k not in ["HTTPValidationError", "ValidationError"]}
 
-spec["paths"] = {k: v for k, v in spec["paths"].items() if k not in ["/docs", "/openapi.json"]}
+spec["paths"] = {
+    k: v for k, v in spec["paths"].items() if k not in ["/docs", "/openapi.json"]
+}
 
-with open('api/spec.json', 'w') as f:
+with open("api/spec.json", "w") as f:
     json.dump(spec, f, indent=2)

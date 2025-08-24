@@ -49,13 +49,18 @@ class AsyncQuerier:
         self._conn = conn
 
     async def create_user(self, arg: CreateUserParams) -> Optional[models.User]:
-        row = (await self._conn.execute(sqlalchemy.text(CREATE_USER), {
-            "p1": arg.sub,
-            "p2": arg.email,
-            "p3": arg.first_name,
-            "p4": arg.last_name,
-            "p5": arg.birthdate,
-        })).first()
+        row = (
+            await self._conn.execute(
+                sqlalchemy.text(CREATE_USER),
+                {
+                    "p1": arg.sub,
+                    "p2": arg.email,
+                    "p3": arg.first_name,
+                    "p4": arg.last_name,
+                    "p5": arg.birthdate,
+                },
+            )
+        ).first()
         if row is None:
             return None
         return models.User(
@@ -73,7 +78,9 @@ class AsyncQuerier:
         )
 
     async def get_user_by_sub(self, *, sub: str) -> Optional[models.User]:
-        row = (await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})).first()
+        row = (
+            await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})
+        ).first()
         if row is None:
             return None
         return models.User(
