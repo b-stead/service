@@ -9,8 +9,10 @@ from typing import Optional
 
 class Customer(pydantic.BaseModel):
     customer_id: str
-    user_id: Optional[str] = None
+    user_id: str
+    name: Optional[str] = None
     company_name: Optional[str] = None
+    organisation: Optional[bool] = None
     contact_person: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None

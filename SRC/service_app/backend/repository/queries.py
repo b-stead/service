@@ -5,7 +5,7 @@
 # source: queries.sql
 import datetime
 import pydantic
-from typing import Optional
+from typing import AsyncIterator, Optional
 
 import sqlalchemy
 import sqlalchemy.ext.asyncio
@@ -16,7 +16,9 @@ from backend.repository import models
 CREATE_CUSTOMER = """-- name: create_customer \\:one
 INSERT INTO "customers" (
     "user_id",
+    "name",
     "company_name",
+    "organisation",
     "contact_person",
     "email",
     "phone",
@@ -28,14 +30,16 @@ INSERT INTO "customers" (
     "country"
 ) VALUES (
     (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE),
-    :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10, :p11
-) RETURNING customer_id, user_id, company_name, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at
+    :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10, :p11, :p12, :p13
+) RETURNING customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at
 """
 
 
 class CreateCustomerParams(pydantic.BaseModel):
     sub: str
+    name: Optional[str] = None
     company_name: Optional[str] = None
+    organisation: Optional[bool] = None
     contact_person: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
@@ -73,9 +77,56 @@ class CreateUserParams(pydantic.BaseModel):
     birthdate: Optional[datetime.date] = None
 
 
+GET_CUSTOMERS_BY_USER_SUB = """-- name: get_customers_by_user_sub \\:many
+SELECT customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at FROM "customers" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "is_deleted" = FALSE
+"""
+
+
 GET_USER_BY_SUB = """-- name: get_user_by_sub \\:one
 SELECT user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at FROM "user" WHERE "sub" = :p1
 """
+
+
+UPDATE_CUSTOMER = """-- name: update_customer \\:one
+UPDATE "customers" 
+SET
+    "name" = COALESCE(:p3, "name"),
+    "company_name" = COALESCE(:p4, "company_name"),
+    "organisation" = COALESCE(:p5, "organisation"),
+    "contact_person" = COALESCE(:p6, "contact_person"),
+    "email" = COALESCE(:p7, "email"),
+    "phone" = COALESCE(:p8, "phone"),
+    "address_line1" = COALESCE(:p9, "address_line1"),
+    "address_line2" = COALESCE(:p10, "address_line2"),
+    "city" = COALESCE(:p11, "city"),
+    "state" = COALESCE(:p12, "state"),
+    "postal_code" = COALESCE(:p13, "postal_code"),
+    "country" = COALESCE(:p14, "country"),
+    "updated_at" = now()
+WHERE 
+    "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+    AND "customer_id" = :p2 AND "is_deleted" = FALSE
+RETURNING customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
+class UpdateCustomerParams(pydantic.BaseModel):
+    sub: str
+    customer_id: str
+    name: Optional[str] = None
+    company_name: Optional[str] = None
+    organisation: Optional[bool] = None
+    contact_person: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
 
 
 class AsyncQuerier:
@@ -85,36 +136,40 @@ class AsyncQuerier:
     async def create_customer(self, arg: CreateCustomerParams) -> Optional[models.Customer]:
         row = (await self._conn.execute(sqlalchemy.text(CREATE_CUSTOMER), {
             "p1": arg.sub,
-            "p2": arg.company_name,
-            "p3": arg.contact_person,
-            "p4": arg.email,
-            "p5": arg.phone,
-            "p6": arg.address_line1,
-            "p7": arg.address_line2,
-            "p8": arg.city,
-            "p9": arg.state,
-            "p10": arg.postal_code,
-            "p11": arg.country,
+            "p2": arg.name,
+            "p3": arg.company_name,
+            "p4": arg.organisation,
+            "p5": arg.contact_person,
+            "p6": arg.email,
+            "p7": arg.phone,
+            "p8": arg.address_line1,
+            "p9": arg.address_line2,
+            "p10": arg.city,
+            "p11": arg.state,
+            "p12": arg.postal_code,
+            "p13": arg.country,
         })).first()
         if row is None:
             return None
         return models.Customer(
             customer_id=row[0],
             user_id=row[1],
-            company_name=row[2],
-            contact_person=row[3],
-            email=row[4],
-            phone=row[5],
-            address_line1=row[6],
-            address_line2=row[7],
-            city=row[8],
-            state=row[9],
-            postal_code=row[10],
-            country=row[11],
-            created_at=row[12],
-            updated_at=row[13],
-            is_deleted=row[14],
-            deleted_at=row[15],
+            name=row[2],
+            company_name=row[3],
+            organisation=row[4],
+            contact_person=row[5],
+            email=row[6],
+            phone=row[7],
+            address_line1=row[8],
+            address_line2=row[9],
+            city=row[10],
+            state=row[11],
+            postal_code=row[12],
+            country=row[13],
+            created_at=row[14],
+            updated_at=row[15],
+            is_deleted=row[16],
+            deleted_at=row[17],
         )
 
     async def create_user(self, arg: CreateUserParams) -> Optional[models.User]:
@@ -141,6 +196,30 @@ class AsyncQuerier:
             deleted_at=row[10],
         )
 
+    async def get_customers_by_user_sub(self, *, sub: str) -> AsyncIterator[models.Customer]:
+        result = await self._conn.stream(sqlalchemy.text(GET_CUSTOMERS_BY_USER_SUB), {"p1": sub})
+        async for row in result:
+            yield models.Customer(
+                customer_id=row[0],
+                user_id=row[1],
+                name=row[2],
+                company_name=row[3],
+                organisation=row[4],
+                contact_person=row[5],
+                email=row[6],
+                phone=row[7],
+                address_line1=row[8],
+                address_line2=row[9],
+                city=row[10],
+                state=row[11],
+                postal_code=row[12],
+                country=row[13],
+                created_at=row[14],
+                updated_at=row[15],
+                is_deleted=row[16],
+                deleted_at=row[17],
+            )
+
     async def get_user_by_sub(self, *, sub: str) -> Optional[models.User]:
         row = (await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})).first()
         if row is None:
@@ -157,4 +236,44 @@ class AsyncQuerier:
             updated_at=row[8],
             is_deleted=row[9],
             deleted_at=row[10],
+        )
+
+    async def update_customer(self, arg: UpdateCustomerParams) -> Optional[models.Customer]:
+        row = (await self._conn.execute(sqlalchemy.text(UPDATE_CUSTOMER), {
+            "p1": arg.sub,
+            "p2": arg.customer_id,
+            "p3": arg.name,
+            "p4": arg.company_name,
+            "p5": arg.organisation,
+            "p6": arg.contact_person,
+            "p7": arg.email,
+            "p8": arg.phone,
+            "p9": arg.address_line1,
+            "p10": arg.address_line2,
+            "p11": arg.city,
+            "p12": arg.state,
+            "p13": arg.postal_code,
+            "p14": arg.country,
+        })).first()
+        if row is None:
+            return None
+        return models.Customer(
+            customer_id=row[0],
+            user_id=row[1],
+            name=row[2],
+            company_name=row[3],
+            organisation=row[4],
+            contact_person=row[5],
+            email=row[6],
+            phone=row[7],
+            address_line1=row[8],
+            address_line2=row[9],
+            city=row[10],
+            state=row[11],
+            postal_code=row[12],
+            country=row[13],
+            created_at=row[14],
+            updated_at=row[15],
+            is_deleted=row[16],
+            deleted_at=row[17],
         )

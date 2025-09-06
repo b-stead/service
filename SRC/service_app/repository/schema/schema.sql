@@ -19,8 +19,10 @@ CREATE UNIQUE INDEX ON "user" ("email") WHERE "is_deleted" = FALSE;
 -- Customers Table
 CREATE TABLE "customers" (
     "customer_id" text NOT NULL PRIMARY KEY DEFAULT gen_random_uuid()::text,
-    "user_id" text REFERENCES "user"("user_id"),
+    "user_id" text NOT NULL REFERENCES "user"("user_id"),
+    "name" text,
     "company_name" text,
+    "organisation" boolean DEFAULT false,
     "contact_person" text,
     "email" text,
     "phone" text,

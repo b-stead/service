@@ -133,6 +133,65 @@
         }
       }
     },
+    "/user/{sub}/customer/{customer_id}": {
+      "put": {
+        "summary": "Update Customer",
+        "description": "Update an existing customer. Partial updates are supported.",
+        "operationId": "update_customer_user__sub__customer__customer_id__put",
+        "parameters": [
+          {
+            "name": "sub",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sub"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Customer Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -185,6 +244,25 @@
           }
         }
       }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Healthz",
+        "operationId": "healthz_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Healthz Healthz Get"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -194,6 +272,17 @@
           "sub": {
             "type": "string",
             "title": "Sub"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
           },
           "company_name": {
             "anyOf": [
@@ -205,6 +294,17 @@
               }
             ],
             "title": "Company Name"
+          },
+          "organisation": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation"
           },
           "contact_person": {
             "anyOf": [
@@ -376,6 +476,10 @@
             "title": "Customer Id"
           },
           "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "name": {
             "anyOf": [
               {
                 "type": "string"
@@ -384,7 +488,7 @@
                 "type": "null"
               }
             ],
-            "title": "User Id"
+            "title": "Name"
           },
           "company_name": {
             "anyOf": [
@@ -396,6 +500,17 @@
               }
             ],
             "title": "Company Name"
+          },
+          "organisation": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation"
           },
           "contact_person": {
             "anyOf": [
@@ -540,6 +655,7 @@
         "type": "object",
         "required": [
           "customer_id",
+          "user_id",
           "is_deleted"
         ],
         "title": "Customer"
@@ -556,6 +672,156 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "UpdateCustomerParams": {
+        "properties": {
+          "sub": {
+            "type": "string",
+            "title": "Sub"
+          },
+          "customer_id": {
+            "type": "string",
+            "title": "Customer Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "company_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Name"
+          },
+          "organisation": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organisation"
+          },
+          "contact_person": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Person"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "address_line1": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line1"
+          },
+          "address_line2": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line2"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sub",
+          "customer_id"
+        ],
+        "title": "UpdateCustomerParams"
       },
       "User": {
         "properties": {
