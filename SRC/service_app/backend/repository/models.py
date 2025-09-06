@@ -7,6 +7,25 @@ import pydantic
 from typing import Optional
 
 
+class Customer(pydantic.BaseModel):
+    customer_id: str
+    user_id: Optional[str] = None
+    company_name: Optional[str] = None
+    contact_person: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    is_deleted: bool
+    deleted_at: Optional[datetime.datetime] = None
+
+
 class User(pydantic.BaseModel):
     user_id: str
     sub: str

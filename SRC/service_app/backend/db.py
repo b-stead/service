@@ -19,11 +19,7 @@ class PostgresDatabase:
     engine: AsyncEngine
 
     def __init__(self) -> None:
-        self.url = f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}\
-            @{POSTGRES_HOST}:\
-            {POSTGRES_PORT}\
-            /{POSTGRES_DATABASE}\
-            ?ssl={POSTGRES_SSLMODE}"
+        self.url = f"postgresql+asyncpg://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DATABASE}?ssl={POSTGRES_SSLMODE}"
         self.engine = create_async_engine(url=self.url)
 
 

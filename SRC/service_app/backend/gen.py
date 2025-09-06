@@ -1,5 +1,5 @@
 from fastapi.openapi.utils import get_openapi
-from main import app
+from .main import app
 import json
 
 spec = get_openapi(

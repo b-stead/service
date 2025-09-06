@@ -1,7 +1,8 @@
 services:
   backend:
     build:
-      context: backend
+      context: ./backend
+      dockerfile: Dockerfile
     pull_policy: build
     ports:
     - '8000:8000'
@@ -11,6 +12,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DATABASE: postgres
       POSTGRES_SSLMODE: disable
+      POSTGRES_PORT: 5432
       SECRET_KEY: foo
       DOCS_USERNAME: docs
       DOCS_PASSWORD: bar

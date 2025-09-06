@@ -13,6 +13,40 @@ import sqlalchemy.ext.asyncio
 from backend.repository import models
 
 
+CREATE_CUSTOMER = """-- name: create_customer \\:one
+INSERT INTO "customers" (
+    "user_id",
+    "company_name",
+    "contact_person",
+    "email",
+    "phone",
+    "address_line1",
+    "address_line2",
+    "city",
+    "state",
+    "postal_code",
+    "country"
+) VALUES (
+    (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE),
+    :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10, :p11
+) RETURNING customer_id, user_id, company_name, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
+class CreateCustomerParams(pydantic.BaseModel):
+    sub: str
+    company_name: Optional[str] = None
+    contact_person: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
+
+
 CREATE_USER = """-- name: create_user \\:one
 INSERT INTO "user" (
     "sub",
@@ -48,19 +82,49 @@ class AsyncQuerier:
     def __init__(self, conn: sqlalchemy.ext.asyncio.AsyncConnection):
         self._conn = conn
 
+    async def create_customer(self, arg: CreateCustomerParams) -> Optional[models.Customer]:
+        row = (await self._conn.execute(sqlalchemy.text(CREATE_CUSTOMER), {
+            "p1": arg.sub,
+            "p2": arg.company_name,
+            "p3": arg.contact_person,
+            "p4": arg.email,
+            "p5": arg.phone,
+            "p6": arg.address_line1,
+            "p7": arg.address_line2,
+            "p8": arg.city,
+            "p9": arg.state,
+            "p10": arg.postal_code,
+            "p11": arg.country,
+        })).first()
+        if row is None:
+            return None
+        return models.Customer(
+            customer_id=row[0],
+            user_id=row[1],
+            company_name=row[2],
+            contact_person=row[3],
+            email=row[4],
+            phone=row[5],
+            address_line1=row[6],
+            address_line2=row[7],
+            city=row[8],
+            state=row[9],
+            postal_code=row[10],
+            country=row[11],
+            created_at=row[12],
+            updated_at=row[13],
+            is_deleted=row[14],
+            deleted_at=row[15],
+        )
+
     async def create_user(self, arg: CreateUserParams) -> Optional[models.User]:
-        row = (
-            await self._conn.execute(
-                sqlalchemy.text(CREATE_USER),
-                {
-                    "p1": arg.sub,
-                    "p2": arg.email,
-                    "p3": arg.first_name,
-                    "p4": arg.last_name,
-                    "p5": arg.birthdate,
-                },
-            )
-        ).first()
+        row = (await self._conn.execute(sqlalchemy.text(CREATE_USER), {
+            "p1": arg.sub,
+            "p2": arg.email,
+            "p3": arg.first_name,
+            "p4": arg.last_name,
+            "p5": arg.birthdate,
+        })).first()
         if row is None:
             return None
         return models.User(
@@ -78,9 +142,7 @@ class AsyncQuerier:
         )
 
     async def get_user_by_sub(self, *, sub: str) -> Optional[models.User]:
-        row = (
-            await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})
-        ).first()
+        row = (await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})).first()
         if row is None:
             return None
         return models.User(

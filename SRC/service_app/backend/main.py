@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 
-from backend.routers import user
+from .routers import user
+from .routers import customers
 
 app = FastAPI(
     title="Service App",
 )
 
 app.include_router(user.router)
-
+app.include_router(customers.router)
 
 @app.get("/docs")
 async def custom_docs():
