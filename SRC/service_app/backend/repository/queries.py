@@ -77,6 +77,11 @@ class CreateUserParams(pydantic.BaseModel):
     birthdate: Optional[datetime.date] = None
 
 
+DELETE_USER_BY_SUB = """-- name: delete_user_by_sub \\:one
+UPDATE "user" SET "is_deleted" = TRUE, "updated_at" = now() , "deleted_at" = now() WHERE "sub" = :p1 RETURNING user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at
+"""
+
+
 GET_CUSTOMERS_BY_USER_SUB = """-- name: get_customers_by_user_sub \\:many
 SELECT customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at FROM "customers" 
 WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
@@ -180,6 +185,24 @@ class AsyncQuerier:
             "p4": arg.last_name,
             "p5": arg.birthdate,
         })).first()
+        if row is None:
+            return None
+        return models.User(
+            user_id=row[0],
+            sub=row[1],
+            email=row[2],
+            email_verified=row[3],
+            first_name=row[4],
+            last_name=row[5],
+            birthdate=row[6],
+            created_date=row[7],
+            updated_at=row[8],
+            is_deleted=row[9],
+            deleted_at=row[10],
+        )
+
+    async def delete_user_by_sub(self, *, sub: str) -> Optional[models.User]:
+        row = (await self._conn.execute(sqlalchemy.text(DELETE_USER_BY_SUB), {"p1": sub})).first()
         if row is None:
             return None
         return models.User(

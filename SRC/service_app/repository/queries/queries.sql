@@ -17,6 +17,8 @@ VALUES (
 -- name: GetUserBySub :one
 SELECT * FROM "user" WHERE "sub" = $1;
 
+-- name: DeleteUserBySub :one
+UPDATE "user" SET "is_deleted" = TRUE, "updated_at" = now() , "deleted_at" = now() WHERE "sub" = $1 RETURNING *;
 
 -- name: CreateCustomer :one
 INSERT INTO "customers" (

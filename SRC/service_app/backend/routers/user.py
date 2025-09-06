@@ -26,7 +26,6 @@ async def create_user(store: Store, input: queries.CreateUserParams) -> User:
         result = await store.create_user(
             queries.CreateUserParams(
                 sub=input.sub,
-                # username=username.username,
                 email=input.email,
                 first_name=input.first_name,
                 last_name=input.last_name,
@@ -50,6 +49,16 @@ async def get_user(store: Store, sub: str) -> User:
         result = await store.get_user_by_sub(sub=sub)
         assert isinstance(result, models.User)
         return result
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.delete("/user/{sub}", status_code=status.HTTP_200_OK)
+async def delete_user(store: Store, sub: str) -> dict:
+    try:
+        await store.delete_user_by_sub(sub=sub)
+        return {"message": "User deleted successfully"}
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
