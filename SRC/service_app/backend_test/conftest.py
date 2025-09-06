@@ -68,7 +68,6 @@ def user_session() -> Generator[requests.Session, None, None]:
   yield UserSession
   UserSession.close()
 
-
 @pytest.fixture(scope="session", autouse=True)
 def setup_and_teardown() -> Generator[None, None, None]:
   # Start Docker Compose
@@ -120,13 +119,13 @@ def setup_and_teardown() -> Generator[None, None, None]:
 #   ], check=True)
 
   # Insert test data
-#   subprocess.run([
-#     "psql",
-#     "-v",
-#     "ON_ERROR_STOP=1",
-#     "--file=repository/testdata/testdata.sql",
-#     "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable"
-#   ], check=True)
+  subprocess.run([
+    "psql",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "--file=repository/testdata/testdata.sql",
+    "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable"
+  ], check=True)
 
   yield
 

@@ -12,9 +12,6 @@ router = APIRouter()
 
 @router.post("/user/{sub}/customer", response_model=Customer, status_code=status.HTTP_201_CREATED)
 async def create_customer(store: Store, sub: str, input: queries.CreateCustomerParams) -> Customer:
-    """
-    Create a new user.
-    """
     try:
         result = await store.create_customer(
             queries.CreateCustomerParams(

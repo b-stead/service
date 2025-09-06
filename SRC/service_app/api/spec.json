@@ -125,7 +125,6 @@
     "/user/{sub}/customer": {
       "post": {
         "summary": "Create Customer",
-        "description": "Create a new user.",
         "operationId": "create_customer_user__sub__customer_post",
         "parameters": [
           {
