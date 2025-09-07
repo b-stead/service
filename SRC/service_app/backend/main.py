@@ -4,6 +4,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 
 from .routers import user
 from .routers import customers
+from .routers import auth
 
 app = FastAPI(
     title="Service App",
@@ -11,6 +12,7 @@ app = FastAPI(
 
 app.include_router(user.router)
 app.include_router(customers.router)
+app.include_router(auth.router)
 
 
 @app.get("/docs")

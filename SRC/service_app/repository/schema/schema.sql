@@ -32,8 +32,30 @@ CREATE TABLE "customers" (
     "state" text,
     "postal_code" text,
     "country" text,
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "is_deleted" boolean NOT NULL DEFAULT false,
     "deleted_at" timestamp NULL
 );
+
+-- Jobs Table
+CREATE TABLE "jobs" (
+    "job_id" text NOT NULL PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    "user_id" text NOT NULL REFERENCES "user"("user_id"),
+    "customer_id" text NOT NULL REFERENCES "customers"("customer_id") ON DELETE RESTRICT,
+    "job_title" text NOT NULL,
+    "job_description" text,
+    "job_status" text NOT NULL CHECK ("job_status" IN ('pending', 'in_progress', 'completed', 'cancelled')) DEFAULT 'pending',
+    "start_date" date,
+    "end_date" date,
+    "estimated_hours" NUMERIC(8,2),
+    "actual_hours" NUMERIC(8,2),
+    "daily_rate" NUMERIC(10,2),
+    "hourly_rate" NUMERIC(10,2),
+    "total_amount" NUMERIC(12,2),
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "is_deleted" boolean NOT NULL DEFAULT false,
+    "deleted_at" timestamp NULL
+);
+

@@ -24,7 +24,6 @@ class PostgresDatabase:
 
 
 database: PostgresDatabase = PostgresDatabase()
-print(f"Database URL: {database.url}")
 
 
 async def get_store() -> AsyncGenerator[Any, Any]:

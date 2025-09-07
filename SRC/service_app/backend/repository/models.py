@@ -3,6 +3,7 @@
 # versions:
 #   sqlc v1.29.0
 import datetime
+import decimal
 import pydantic
 from typing import Optional
 
@@ -22,6 +23,26 @@ class Customer(pydantic.BaseModel):
     state: Optional[str] = None
     postal_code: Optional[str] = None
     country: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    is_deleted: bool
+    deleted_at: Optional[datetime.datetime] = None
+
+
+class Job(pydantic.BaseModel):
+    job_id: str
+    user_id: str
+    customer_id: str
+    job_title: str
+    job_description: Optional[str] = None
+    job_status: str
+    start_date: Optional[datetime.date] = None
+    end_date: Optional[datetime.date] = None
+    estimated_hours: Optional[decimal.Decimal] = None
+    actual_hours: Optional[decimal.Decimal] = None
+    daily_rate: Optional[decimal.Decimal] = None
+    hourly_rate: Optional[decimal.Decimal] = None
+    total_amount: Optional[decimal.Decimal] = None
     created_at: Optional[datetime.datetime] = None
     updated_at: Optional[datetime.datetime] = None
     is_deleted: bool

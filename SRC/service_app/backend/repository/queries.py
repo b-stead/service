@@ -4,8 +4,9 @@
 #   sqlc v1.29.0
 # source: queries.sql
 import datetime
+import decimal
 import pydantic
-from typing import AsyncIterator, Optional
+from typing import Any, AsyncIterator, Optional
 
 import sqlalchemy
 import sqlalchemy.ext.asyncio
@@ -51,6 +52,42 @@ class CreateCustomerParams(pydantic.BaseModel):
     country: Optional[str] = None
 
 
+CREATE_JOB = """-- name: create_job \\:one
+INSERT INTO "jobs" (
+    "user_id",
+    "customer_id",
+    "job_title",
+    "job_description",
+    "job_status",
+    "start_date",
+    "end_date",
+    "estimated_hours",
+    "actual_hours",
+    "daily_rate",
+    "hourly_rate",
+    "total_amount"
+) VALUES (
+    (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE),
+    :p2, :p3, :p4, COALESCE(:p5, 'pending'), :p6, :p7, :p8, :p9, :p10, :p11, :p12
+) RETURNING job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
+class CreateJobParams(pydantic.BaseModel):
+    sub: str
+    customer_id: str
+    job_title: str
+    job_description: Optional[str] = None
+    column_5: Optional[Any] = None
+    start_date: Optional[datetime.date] = None
+    end_date: Optional[datetime.date] = None
+    estimated_hours: Optional[decimal.Decimal] = None
+    actual_hours: Optional[decimal.Decimal] = None
+    daily_rate: Optional[decimal.Decimal] = None
+    hourly_rate: Optional[decimal.Decimal] = None
+    total_amount: Optional[decimal.Decimal] = None
+
+
 CREATE_USER = """-- name: create_user \\:one
 INSERT INTO "user" (
     "sub",
@@ -77,13 +114,74 @@ class CreateUserParams(pydantic.BaseModel):
     birthdate: Optional[datetime.date] = None
 
 
+DELETE_CUSTOMER = """-- name: delete_customer \\:one
+UPDATE "customers"
+SET "is_deleted" = TRUE, "updated_at" = now(), "deleted_at" = now()
+WHERE 
+    "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+    AND "customer_id" = :p2 AND "is_deleted" = FALSE
+RETURNING customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
+DELETE_JOB = """-- name: delete_job \\:one
+UPDATE "jobs"
+SET "is_deleted" = TRUE, "updated_at" = now(), "deleted_at" = now()
+WHERE 
+    "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+    AND "job_id" = :p2 AND "is_deleted" = FALSE
+RETURNING job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
 DELETE_USER_BY_SUB = """-- name: delete_user_by_sub \\:one
 UPDATE "user" SET "is_deleted" = TRUE, "updated_at" = now() , "deleted_at" = now() WHERE "sub" = :p1 RETURNING user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at
 """
 
 
-GET_CUSTOMERS_BY_USER_SUB = """-- name: get_customers_by_user_sub \\:many
+GET_CUSTOMER_BY_ID = """-- name: get_customer_by_id \\:one
 SELECT customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at FROM "customers" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "customer_id" = :p2 AND "is_deleted" = FALSE
+"""
+
+
+GET_JOB_BY_ID = """-- name: get_job_by_id \\:one
+SELECT job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at FROM "jobs" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "job_id" = :p2 AND "is_deleted" = FALSE
+"""
+
+
+GET_JOBS_BY_CUSTOMER_ID = """-- name: get_jobs_by_customer_id \\:many
+SELECT job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at FROM "jobs" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "customer_id" = :p2 AND "is_deleted" = FALSE
+"""
+
+
+GET_JOBS_BY_DATE_RANGE = """-- name: get_jobs_by_date_range \\:many
+SELECT job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at FROM "jobs" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "start_date" >= :p2 AND "end_date" <= :p3 AND "is_deleted" = FALSE
+"""
+
+
+class GetJobsByDateRangeParams(pydantic.BaseModel):
+    sub: str
+    start_date: Optional[datetime.date] = None
+    end_date: Optional[datetime.date] = None
+
+
+GET_JOBS_BY_STATUS = """-- name: get_jobs_by_status \\:many
+SELECT job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at FROM "jobs" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "job_status" = :p2 AND "is_deleted" = FALSE
+"""
+
+
+GET_JOBS_BY_USER_SUB = """-- name: get_jobs_by_user_sub \\:many
+SELECT job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at FROM "jobs" 
 WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
 AND "is_deleted" = FALSE
 """
@@ -91,6 +189,18 @@ AND "is_deleted" = FALSE
 
 GET_USER_BY_SUB = """-- name: get_user_by_sub \\:one
 SELECT user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at FROM "user" WHERE "sub" = :p1
+"""
+
+
+LIST_CUSTOMERS_BY_SUB = """-- name: list_customers_by_sub \\:many
+SELECT customer_id, user_id, name, company_name, organisation, contact_person, email, phone, address_line1, address_line2, city, state, postal_code, country, created_at, updated_at, is_deleted, deleted_at FROM "customers" 
+WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+AND "is_deleted" = FALSE
+"""
+
+
+LIST_USERS = """-- name: list_users \\:many
+SELECT user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at FROM "user"
 """
 
 
@@ -132,6 +242,55 @@ class UpdateCustomerParams(pydantic.BaseModel):
     state: Optional[str] = None
     postal_code: Optional[str] = None
     country: Optional[str] = None
+
+
+UPDATE_JOB = """-- name: update_job \\:one
+UPDATE "jobs"
+SET
+    "customer_id" = COALESCE(:p3, "customer_id"),
+    "job_title" = COALESCE(:p4, "job_title"),
+    "job_description" = COALESCE(:p5, "job_description"),
+    "job_status" = COALESCE(:p6, "job_status"),
+    "start_date" = COALESCE(:p7, "start_date"),
+    "end_date" = COALESCE(:p8, "end_date"),
+    "estimated_hours" = COALESCE(:p9, "estimated_hours"),
+    "actual_hours" = COALESCE(:p10, "actual_hours"),
+    "daily_rate" = COALESCE(:p11, "daily_rate"),
+    "hourly_rate" = COALESCE(:p12, "hourly_rate"),
+    "total_amount" = COALESCE(:p13, "total_amount"),
+    "updated_at" = now()
+WHERE 
+    "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+    AND "job_id" = :p2 AND "is_deleted" = FALSE
+RETURNING job_id, user_id, customer_id, job_title, job_description, job_status, start_date, end_date, estimated_hours, actual_hours, daily_rate, hourly_rate, total_amount, created_at, updated_at, is_deleted, deleted_at
+"""
+
+
+class UpdateJobParams(pydantic.BaseModel):
+    sub: str
+    job_id: str
+    customer_id: str
+    job_title: str
+    job_description: Optional[str] = None
+    job_status: str
+    start_date: Optional[datetime.date] = None
+    end_date: Optional[datetime.date] = None
+    estimated_hours: Optional[decimal.Decimal] = None
+    actual_hours: Optional[decimal.Decimal] = None
+    daily_rate: Optional[decimal.Decimal] = None
+    hourly_rate: Optional[decimal.Decimal] = None
+    total_amount: Optional[decimal.Decimal] = None
+
+
+VALID_USER = """-- name: valid_user \\:one
+SELECT
+  "sub"
+FROM
+  "user"
+WHERE
+  "sub" = :p1
+  AND is_deleted = FALSE
+"""
 
 
 class AsyncQuerier:
@@ -177,6 +336,43 @@ class AsyncQuerier:
             deleted_at=row[17],
         )
 
+    async def create_job(self, arg: CreateJobParams) -> Optional[models.Job]:
+        row = (await self._conn.execute(sqlalchemy.text(CREATE_JOB), {
+            "p1": arg.sub,
+            "p2": arg.customer_id,
+            "p3": arg.job_title,
+            "p4": arg.job_description,
+            "p5": arg.column_5,
+            "p6": arg.start_date,
+            "p7": arg.end_date,
+            "p8": arg.estimated_hours,
+            "p9": arg.actual_hours,
+            "p10": arg.daily_rate,
+            "p11": arg.hourly_rate,
+            "p12": arg.total_amount,
+        })).first()
+        if row is None:
+            return None
+        return models.Job(
+            job_id=row[0],
+            user_id=row[1],
+            customer_id=row[2],
+            job_title=row[3],
+            job_description=row[4],
+            job_status=row[5],
+            start_date=row[6],
+            end_date=row[7],
+            estimated_hours=row[8],
+            actual_hours=row[9],
+            daily_rate=row[10],
+            hourly_rate=row[11],
+            total_amount=row[12],
+            created_at=row[13],
+            updated_at=row[14],
+            is_deleted=row[15],
+            deleted_at=row[16],
+        )
+
     async def create_user(self, arg: CreateUserParams) -> Optional[models.User]:
         row = (await self._conn.execute(sqlalchemy.text(CREATE_USER), {
             "p1": arg.sub,
@@ -201,6 +397,55 @@ class AsyncQuerier:
             deleted_at=row[10],
         )
 
+    async def delete_customer(self, *, sub: str, customer_id: str) -> Optional[models.Customer]:
+        row = (await self._conn.execute(sqlalchemy.text(DELETE_CUSTOMER), {"p1": sub, "p2": customer_id})).first()
+        if row is None:
+            return None
+        return models.Customer(
+            customer_id=row[0],
+            user_id=row[1],
+            name=row[2],
+            company_name=row[3],
+            organisation=row[4],
+            contact_person=row[5],
+            email=row[6],
+            phone=row[7],
+            address_line1=row[8],
+            address_line2=row[9],
+            city=row[10],
+            state=row[11],
+            postal_code=row[12],
+            country=row[13],
+            created_at=row[14],
+            updated_at=row[15],
+            is_deleted=row[16],
+            deleted_at=row[17],
+        )
+
+    async def delete_job(self, *, sub: str, job_id: str) -> Optional[models.Job]:
+        row = (await self._conn.execute(sqlalchemy.text(DELETE_JOB), {"p1": sub, "p2": job_id})).first()
+        if row is None:
+            return None
+        return models.Job(
+            job_id=row[0],
+            user_id=row[1],
+            customer_id=row[2],
+            job_title=row[3],
+            job_description=row[4],
+            job_status=row[5],
+            start_date=row[6],
+            end_date=row[7],
+            estimated_hours=row[8],
+            actual_hours=row[9],
+            daily_rate=row[10],
+            hourly_rate=row[11],
+            total_amount=row[12],
+            created_at=row[13],
+            updated_at=row[14],
+            is_deleted=row[15],
+            deleted_at=row[16],
+        )
+
     async def delete_user_by_sub(self, *, sub: str) -> Optional[models.User]:
         row = (await self._conn.execute(sqlalchemy.text(DELETE_USER_BY_SUB), {"p1": sub})).first()
         if row is None:
@@ -219,8 +464,167 @@ class AsyncQuerier:
             deleted_at=row[10],
         )
 
-    async def get_customers_by_user_sub(self, *, sub: str) -> AsyncIterator[models.Customer]:
-        result = await self._conn.stream(sqlalchemy.text(GET_CUSTOMERS_BY_USER_SUB), {"p1": sub})
+    async def get_customer_by_id(self, *, sub: str, customer_id: str) -> Optional[models.Customer]:
+        row = (await self._conn.execute(sqlalchemy.text(GET_CUSTOMER_BY_ID), {"p1": sub, "p2": customer_id})).first()
+        if row is None:
+            return None
+        return models.Customer(
+            customer_id=row[0],
+            user_id=row[1],
+            name=row[2],
+            company_name=row[3],
+            organisation=row[4],
+            contact_person=row[5],
+            email=row[6],
+            phone=row[7],
+            address_line1=row[8],
+            address_line2=row[9],
+            city=row[10],
+            state=row[11],
+            postal_code=row[12],
+            country=row[13],
+            created_at=row[14],
+            updated_at=row[15],
+            is_deleted=row[16],
+            deleted_at=row[17],
+        )
+
+    async def get_job_by_id(self, *, sub: str, job_id: str) -> Optional[models.Job]:
+        row = (await self._conn.execute(sqlalchemy.text(GET_JOB_BY_ID), {"p1": sub, "p2": job_id})).first()
+        if row is None:
+            return None
+        return models.Job(
+            job_id=row[0],
+            user_id=row[1],
+            customer_id=row[2],
+            job_title=row[3],
+            job_description=row[4],
+            job_status=row[5],
+            start_date=row[6],
+            end_date=row[7],
+            estimated_hours=row[8],
+            actual_hours=row[9],
+            daily_rate=row[10],
+            hourly_rate=row[11],
+            total_amount=row[12],
+            created_at=row[13],
+            updated_at=row[14],
+            is_deleted=row[15],
+            deleted_at=row[16],
+        )
+
+    async def get_jobs_by_customer_id(self, *, sub: str, customer_id: str) -> AsyncIterator[models.Job]:
+        result = await self._conn.stream(sqlalchemy.text(GET_JOBS_BY_CUSTOMER_ID), {"p1": sub, "p2": customer_id})
+        async for row in result:
+            yield models.Job(
+                job_id=row[0],
+                user_id=row[1],
+                customer_id=row[2],
+                job_title=row[3],
+                job_description=row[4],
+                job_status=row[5],
+                start_date=row[6],
+                end_date=row[7],
+                estimated_hours=row[8],
+                actual_hours=row[9],
+                daily_rate=row[10],
+                hourly_rate=row[11],
+                total_amount=row[12],
+                created_at=row[13],
+                updated_at=row[14],
+                is_deleted=row[15],
+                deleted_at=row[16],
+            )
+
+    async def get_jobs_by_date_range(self, arg: GetJobsByDateRangeParams) -> AsyncIterator[models.Job]:
+        result = await self._conn.stream(sqlalchemy.text(GET_JOBS_BY_DATE_RANGE), {"p1": arg.sub, "p2": arg.start_date, "p3": arg.end_date})
+        async for row in result:
+            yield models.Job(
+                job_id=row[0],
+                user_id=row[1],
+                customer_id=row[2],
+                job_title=row[3],
+                job_description=row[4],
+                job_status=row[5],
+                start_date=row[6],
+                end_date=row[7],
+                estimated_hours=row[8],
+                actual_hours=row[9],
+                daily_rate=row[10],
+                hourly_rate=row[11],
+                total_amount=row[12],
+                created_at=row[13],
+                updated_at=row[14],
+                is_deleted=row[15],
+                deleted_at=row[16],
+            )
+
+    async def get_jobs_by_status(self, *, sub: str, job_status: str) -> AsyncIterator[models.Job]:
+        result = await self._conn.stream(sqlalchemy.text(GET_JOBS_BY_STATUS), {"p1": sub, "p2": job_status})
+        async for row in result:
+            yield models.Job(
+                job_id=row[0],
+                user_id=row[1],
+                customer_id=row[2],
+                job_title=row[3],
+                job_description=row[4],
+                job_status=row[5],
+                start_date=row[6],
+                end_date=row[7],
+                estimated_hours=row[8],
+                actual_hours=row[9],
+                daily_rate=row[10],
+                hourly_rate=row[11],
+                total_amount=row[12],
+                created_at=row[13],
+                updated_at=row[14],
+                is_deleted=row[15],
+                deleted_at=row[16],
+            )
+
+    async def get_jobs_by_user_sub(self, *, sub: str) -> AsyncIterator[models.Job]:
+        result = await self._conn.stream(sqlalchemy.text(GET_JOBS_BY_USER_SUB), {"p1": sub})
+        async for row in result:
+            yield models.Job(
+                job_id=row[0],
+                user_id=row[1],
+                customer_id=row[2],
+                job_title=row[3],
+                job_description=row[4],
+                job_status=row[5],
+                start_date=row[6],
+                end_date=row[7],
+                estimated_hours=row[8],
+                actual_hours=row[9],
+                daily_rate=row[10],
+                hourly_rate=row[11],
+                total_amount=row[12],
+                created_at=row[13],
+                updated_at=row[14],
+                is_deleted=row[15],
+                deleted_at=row[16],
+            )
+
+    async def get_user_by_sub(self, *, sub: str) -> Optional[models.User]:
+        row = (await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})).first()
+        if row is None:
+            return None
+        return models.User(
+            user_id=row[0],
+            sub=row[1],
+            email=row[2],
+            email_verified=row[3],
+            first_name=row[4],
+            last_name=row[5],
+            birthdate=row[6],
+            created_date=row[7],
+            updated_at=row[8],
+            is_deleted=row[9],
+            deleted_at=row[10],
+        )
+
+    async def list_customers_by_sub(self, *, sub: str) -> AsyncIterator[models.Customer]:
+        result = await self._conn.stream(sqlalchemy.text(LIST_CUSTOMERS_BY_SUB), {"p1": sub})
         async for row in result:
             yield models.Customer(
                 customer_id=row[0],
@@ -243,23 +647,22 @@ class AsyncQuerier:
                 deleted_at=row[17],
             )
 
-    async def get_user_by_sub(self, *, sub: str) -> Optional[models.User]:
-        row = (await self._conn.execute(sqlalchemy.text(GET_USER_BY_SUB), {"p1": sub})).first()
-        if row is None:
-            return None
-        return models.User(
-            user_id=row[0],
-            sub=row[1],
-            email=row[2],
-            email_verified=row[3],
-            first_name=row[4],
-            last_name=row[5],
-            birthdate=row[6],
-            created_date=row[7],
-            updated_at=row[8],
-            is_deleted=row[9],
-            deleted_at=row[10],
-        )
+    async def list_users(self) -> AsyncIterator[models.User]:
+        result = await self._conn.stream(sqlalchemy.text(LIST_USERS))
+        async for row in result:
+            yield models.User(
+                user_id=row[0],
+                sub=row[1],
+                email=row[2],
+                email_verified=row[3],
+                first_name=row[4],
+                last_name=row[5],
+                birthdate=row[6],
+                created_date=row[7],
+                updated_at=row[8],
+                is_deleted=row[9],
+                deleted_at=row[10],
+            )
 
     async def update_customer(self, arg: UpdateCustomerParams) -> Optional[models.Customer]:
         row = (await self._conn.execute(sqlalchemy.text(UPDATE_CUSTOMER), {
@@ -300,3 +703,47 @@ class AsyncQuerier:
             is_deleted=row[16],
             deleted_at=row[17],
         )
+
+    async def update_job(self, arg: UpdateJobParams) -> Optional[models.Job]:
+        row = (await self._conn.execute(sqlalchemy.text(UPDATE_JOB), {
+            "p1": arg.sub,
+            "p2": arg.job_id,
+            "p3": arg.customer_id,
+            "p4": arg.job_title,
+            "p5": arg.job_description,
+            "p6": arg.job_status,
+            "p7": arg.start_date,
+            "p8": arg.end_date,
+            "p9": arg.estimated_hours,
+            "p10": arg.actual_hours,
+            "p11": arg.daily_rate,
+            "p12": arg.hourly_rate,
+            "p13": arg.total_amount,
+        })).first()
+        if row is None:
+            return None
+        return models.Job(
+            job_id=row[0],
+            user_id=row[1],
+            customer_id=row[2],
+            job_title=row[3],
+            job_description=row[4],
+            job_status=row[5],
+            start_date=row[6],
+            end_date=row[7],
+            estimated_hours=row[8],
+            actual_hours=row[9],
+            daily_rate=row[10],
+            hourly_rate=row[11],
+            total_amount=row[12],
+            created_at=row[13],
+            updated_at=row[14],
+            is_deleted=row[15],
+            deleted_at=row[16],
+        )
+
+    async def valid_user(self, *, sub: str) -> Optional[str]:
+        row = (await self._conn.execute(sqlalchemy.text(VALID_USER), {"p1": sub})).first()
+        if row is None:
+            return None
+        return row[0]
