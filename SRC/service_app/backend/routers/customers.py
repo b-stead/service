@@ -89,3 +89,19 @@ async def list_customers_by_sub(store: Store, sub: str, actor: Actor) -> list[Cu
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.delete("/user/{sub}/customer/{customer_id}", status_code=status.HTTP_200_OK)
+async def delete_customer(store: Store, sub: str, actor: Actor, customer_id: str) -> dict:
+    """
+    Delete a customer by ID.
+    """
+    if sub != actor:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    try:
+        customer_id = customer_id
+        await store.delete_customer(customer_id=customer_id)
+        return {"message": "Customer deleted successfully"}
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -41,7 +41,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/user/{sub}": {
@@ -90,6 +95,11 @@
       "delete": {
         "summary": "Delete User",
         "operationId": "delete_user_user__sub__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sub",
@@ -153,6 +163,11 @@
       "post": {
         "summary": "Create Customer",
         "operationId": "create_customer_user__sub__customer_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sub",
@@ -203,6 +218,11 @@
         "summary": "Update Customer",
         "description": "Update an existing customer. Partial updates are supported.",
         "operationId": "update_customer_user__sub__customer__customer_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sub",
@@ -211,15 +231,6 @@
             "schema": {
               "type": "string",
               "title": "Sub"
-            }
-          },
-          {
-            "name": "customer_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Customer Id"
             }
           }
         ],
@@ -260,6 +271,11 @@
         "summary": "Get Customer",
         "description": "Get a customer by ID.",
         "operationId": "get_customer_user__sub__customer__customer_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sub",
@@ -309,6 +325,11 @@
         "summary": "List Customers By Sub",
         "description": "List all customers for a user.",
         "operationId": "list_customers_by_sub_user__sub__customers_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "sub",

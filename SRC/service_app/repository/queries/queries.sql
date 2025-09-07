@@ -115,7 +115,7 @@ SELECT * FROM "jobs"
 WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = $1 AND "is_deleted" = FALSE)
 AND "job_id" = $2 AND "is_deleted" = FALSE;
 
--- name: GetJobsByUserSub :many
+-- name: ListJobsBySub :many
 SELECT * FROM "jobs" 
 WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = $1 AND "is_deleted" = FALSE)
 AND "is_deleted" = FALSE;
