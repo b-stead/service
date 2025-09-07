@@ -69,7 +69,7 @@ async def delete_user(store: Store, sub: str, actor: Actor) -> dict:
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 @router.get("/users", response_model=list[User], status_code=status.HTTP_200_OK)
 async def list_users(store: Store) -> list[User]:

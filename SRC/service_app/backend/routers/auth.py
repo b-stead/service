@@ -1,13 +1,11 @@
-from typing import Annotated, Any
+from typing import Annotated
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
 import jwt
-from datetime import timedelta, datetime
+from datetime import timedelta
 from backend.db import Store
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import requests
-from functools import lru_cache
-from backend.config import SECRET_KEY, TOKEN_LIFETIME_SECONDS, TOKEN_LEEWAY_SECONDS
+from backend.config import SECRET_KEY, TOKEN_LEEWAY_SECONDS
 import structlog
 
 logger = structlog.get_logger(module=__name__)
@@ -15,55 +13,56 @@ router = APIRouter()
 
 
 class TokenRequest(BaseModel):
-  id_token: str
+    id_token: str
 
 
 class TokenResponse(BaseModel):
-  access_token: str
-  token_type: str
-  expires_in: int
+    access_token: str
+    token_type: str
+    expires_in: int
 
 
 backendScheme = HTTPBearer(bearerFormat="JWT")
 
+
 async def valid_user(store: Store, token: Annotated[HTTPAuthorizationCredentials, Depends(backendScheme)]) -> str:
-  """Confirm that the access token is valid and that the user exists in the database"""
-  try:
-    payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=['HS256'], leeway=timedelta(seconds=TOKEN_LEEWAY_SECONDS)) 
-  except jwt.PyJWTError as err:
-    logger.warning(f"access attempt with invalid token: {err}", exc_info=err)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-  except Exception as err:
-    logger.error(f"unexpected error: {err}", exc_info=err)
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-  sub: str | None = payload.get('sub')
-  if sub is None:
-    logger.warning("access attempt with token without subject")
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-  try:
-    result = await store.valid_user(sub=sub)
-  except Exception as err:
-    logger.error(f"unexpected error: {err}", exc_info=err)
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-  if result is None:
-    logger.warning("access attempt with token for non-existent user")
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-  return sub
+    """Confirm that the access token is valid and that the user exists in the database"""
+    try:
+        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=['HS256'], leeway=timedelta(seconds=TOKEN_LEEWAY_SECONDS))
+    except jwt.PyJWTError as err:
+        logger.warning(f"access attempt with invalid token: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    sub: str | None = payload.get('sub')
+    if sub is None:
+        logger.warning("access attempt with token without subject")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    try:
+        result = await store.valid_user(sub=sub)
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    if result is None:
+        logger.warning("access attempt with token for non-existent user")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return sub
 Actor = Annotated[str, Depends(valid_user)]
 
 
 async def valid_new_user(token: Annotated[HTTPAuthorizationCredentials, Depends(backendScheme)]) -> str:
-  """Confirm only that the access token is valid"""
-  try:
-    payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=['HS256'], leeway=timedelta(seconds=TOKEN_LEEWAY_SECONDS))
-  except jwt.PyJWTError as err:
-    logger.warning(f"access attempt with invalid token: {err}", exc_info=err)
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-  sub: str | None = payload.get('sub')
-  if sub is None:
-    logger.warning("access attempt with token without subject")
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-  return sub
+    """Confirm only that the access token is valid"""
+    try:
+        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=['HS256'], leeway=timedelta(seconds=TOKEN_LEEWAY_SECONDS))
+    except jwt.PyJWTError as err:
+        logger.warning(f"access attempt with invalid token: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    sub: str | None = payload.get('sub')
+    if sub is None:
+        logger.warning("access attempt with token without subject")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return sub
 NewActor = Annotated[str, Depends(valid_new_user)]
 
 
@@ -111,5 +110,3 @@ NewActor = Annotated[str, Depends(valid_new_user)]
 #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # backendScheme = HTTPBearer(bearerFormat="JWT")
-
-

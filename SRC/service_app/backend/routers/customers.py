@@ -54,7 +54,7 @@ async def update_customer(
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 @router.get("/user/{sub}/customer/{customer_id}", response_model=Customer)
 async def get_customer(store: Store, sub: str, actor: Actor, customer_id: str) -> Customer:
@@ -72,7 +72,8 @@ async def get_customer(store: Store, sub: str, actor: Actor, customer_id: str) -
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
 @router.get("/user/{sub}/customers", response_model=list[Customer])
 async def list_customers_by_sub(store: Store, sub: str, actor: Actor) -> list[Customer]:
     """

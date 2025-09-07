@@ -29,8 +29,9 @@ async def root():
 async def read_item(item_id: int):
     return {"item_id": item_id}
 
+
 @app.get("/healthz", response_model=str)
 def healthz(healthcheck: Healthcheck) -> str:
-  if not healthcheck:
-    raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
-  return "ok"
+    if not healthcheck:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+    return "ok"

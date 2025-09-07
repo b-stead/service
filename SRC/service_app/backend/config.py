@@ -7,6 +7,7 @@ def getenv_or_panic(env: str) -> str:
         raise RuntimeError(f"{env} is required")
     return value
 
+
 # Required configuration
 SECRET_KEY = getenv_or_panic("SECRET_KEY")
 # TOKEN_ISSUER = getenv_or_panic("TOKEN_ISSUER")
