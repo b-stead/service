@@ -31,7 +31,7 @@ jobs:
             - name: docker build
               uses: docker/build-push-action@v6
               with:
-                context: backend
+                context: ./SRC/service_app/backend
                 load: true
                 tags: backend:latest
             - name: test
