@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException, status
-from typing import Callable
 from backend.db import Healthcheck
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.responses import HTMLResponse
@@ -17,7 +16,7 @@ app.include_router(auth.router)
 
 
 @app.get("/docs", response_class=HTMLResponse)
-async def custom_docs()-> HTMLResponse:
+async def custom_docs() -> HTMLResponse:
     return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
 
 
