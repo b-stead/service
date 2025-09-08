@@ -27,4 +27,18 @@ jobs:
               working-directory: ./SRC/service_app
               run: |
                 flake8 backend
+            - name: mypy
+              run: |
+                mypy backend
+                mypy backend_test
+            - uses: docker/setup-buildx-action@v3
+            - name: docker build
+              uses: docker/build-push-action@v6
+              with:
+                context: backend
+                load: true
+                tags: backend:latest
+            - name: test
+              run: |
+                pytest backend_test --order-dependencies
 
