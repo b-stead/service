@@ -36,5 +36,5 @@ jobs:
                 tags: backend:latest
             - name: test
               run: |
-                pytest ./SRC/service_App/backend_test --order-dependencies
+                pytest ./SRC/service_app/backend_test --order-dependencies
 
