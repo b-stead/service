@@ -1,4 +1,4 @@
-from fastapi.openapi.utils import get_openapi
+from fastapi.openapi.utils import get_openapi # type: ignore
 from .main import app
 import json
 
