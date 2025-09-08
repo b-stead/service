@@ -4,4 +4,4 @@ Service_app backend using [Python 3.12](https://docs.python.org/3.12/), [FastAPI
 
 Current frontend implementation needs to change to support FastAPI over DRF.
 
-Added Pytest to CI
+Added Pytest to CI, Testing Docker run testing
