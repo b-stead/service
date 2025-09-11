@@ -1,6 +1,7 @@
 services:
   backend-db:
     image: postgres:16
+    container_name: backend-db
     command:
     - -c
     - log_connections=true
@@ -12,3 +13,5 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_USERNAME: postgres
       POSTGRES_DATABASE: postgres
+    networks:
+      - app-network

@@ -11,7 +11,7 @@ Customer = models.Customer
 router = APIRouter()
 
 
-@router.post("/user/{sub}/customer", response_model=Customer, status_code=status.HTTP_201_CREATED)
+@router.post("/api/user/{sub}/customer", response_model=Customer, status_code=status.HTTP_201_CREATED)
 async def create_customer(store: Store, sub: str, actor: Actor, input: queries.CreateCustomerParams) -> Customer:
     if sub != actor:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -33,7 +33,7 @@ async def create_customer(store: Store, sub: str, actor: Actor, input: queries.C
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/user/{sub}/customer/{customer_id}", response_model=Customer)
+@router.put("/api/user/{sub}/customer/{customer_id}", response_model=Customer)
 async def update_customer(
     store: Store, sub: str, actor: Actor, input: queries.UpdateCustomerParams
 ) -> Customer:
@@ -56,7 +56,7 @@ async def update_customer(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/customer/{customer_id}", response_model=Customer)
+@router.get("/api/user/{sub}/customer/{customer_id}", response_model=Customer)
 async def get_customer(store: Store, sub: str, actor: Actor, customer_id: str) -> Customer:
     """
     Get a customer by ID.
@@ -74,7 +74,7 @@ async def get_customer(store: Store, sub: str, actor: Actor, customer_id: str) -
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/customers", response_model=list[Customer])
+@router.get("/api/user/{sub}/customers", response_model=list[Customer])
 async def list_customers_by_sub(store: Store, sub: str, actor: Actor) -> list[Customer]:
     """
     List all customers for a user.
@@ -91,7 +91,7 @@ async def list_customers_by_sub(store: Store, sub: str, actor: Actor) -> list[Cu
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/user/{sub}/customer/{customer_id}", status_code=status.HTTP_200_OK)
+@router.delete("/api/user/{sub}/customer/{customer_id}", status_code=status.HTTP_200_OK)
 async def delete_customer(store: Store, sub: str, actor: Actor, customer_id: str) -> dict:
     """
     Delete a customer by ID.

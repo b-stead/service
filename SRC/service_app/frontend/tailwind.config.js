@@ -5,6 +5,8 @@ module.exports = {
     "./public/index.html",
     "./frontend/src/**/*.{js,jsx,ts,tsx}",
     "./frontend/public/index.html",
+    "/app/src/**/*.{js,jsx,ts,tsx}", // Adjusted for Docker build context
+    "/app/public/index.html", 
   ],
   theme: {
     extend: {

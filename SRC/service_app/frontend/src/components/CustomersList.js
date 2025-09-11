@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../api/axios";
+import api from "../api/Axios";
 
 const CustomersList = () => {
   const [customers, setCustomers] = useState([]); // State to store customers
@@ -13,8 +13,13 @@ const CustomersList = () => {
     const fetchCustomers = async () => {
       try {
         const response = await api.get(`/user/${sub}/customers`);
+        console.log("API Response:", response.data);
+
+        if (Array.isArray(response.data)) {
           setCustomers(response.data); // Update customers state
+        } else {
           console.log("Fetched customers:", response.data);
+        }
       } catch (err) {
         console.error("Error fetching customers:", err);
         setError("Failed to fetch customers.");

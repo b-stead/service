@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import CustomersList from "../components/CustomersList";
 import JobsList from "../components/JobsList";
 import InvoicesList from "../components/InvoicesList";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const DashboardPage = () => {
   const [view, setView] = useState("customers"); // Default view is "customers"
@@ -32,8 +33,10 @@ const DashboardPage = () => {
         {/* Header */}
         <Header title="Dashboard" />
 
-        {/* Content */}
-        <div className="p-6 bg-tertiary text-primary">{renderContent()}</div>
+        {/* Content Area Wrapped in ErrorBoundary */}
+        <ErrorBoundary>
+          <div className="p-6 bg-tertiary text-primary">{renderContent()}</div>
+          </ErrorBoundary>
       </div>
     </div>
   );
