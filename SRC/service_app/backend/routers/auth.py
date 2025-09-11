@@ -28,6 +28,8 @@ backendScheme = HTTPBearer(bearerFormat="JWT")
 async def valid_user(store: Store, token: Annotated[HTTPAuthorizationCredentials, Depends(backendScheme)]) -> str:
     """Confirm that the access token is valid and that the user exists in the database"""
     try:
+        print("Decoding JWT token:", token)
+        print("Decoding JWT token:", token.credentials)
         payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=['HS256'], leeway=timedelta(seconds=TOKEN_LEEWAY_SECONDS))
     except jwt.PyJWTError as err:
         logger.warning(f"access attempt with invalid token: {err}", exc_info=err)

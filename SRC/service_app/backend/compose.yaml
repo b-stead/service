@@ -3,6 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: backend
     pull_policy: build
     ports:
     - '8000:8000'
@@ -17,3 +18,20 @@ services:
       DOCS_USERNAME: docs
       DOCS_PASSWORD: bar
       LOG_STYLE: ${LOG_STYLE:-json}
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    image: frontend:latest
+    restart: always
+    pull_policy: build # remove for procution rebuilds
+    ports:
+      - "127.0.0.1:3000:80" # Restrict to localhost
+    volumes:
+      - ./frontend/src:/app/src # remove for production rebuilds
+      - ./frontend/public:/app/public
+    depends_on:
+      - backend
+        # condition: service_healthy

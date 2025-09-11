@@ -8,7 +8,6 @@ from datetime import date, timedelta
 @pytest.mark.dependency()
 def test_create_user(base_url: str, user_sub: str, user_session: Session, user_session_data: dict[str, Any]) -> None:
   url = f"{base_url}/user"
-  print('usr_url:', url)
   payload = {
     "sub": user_sub,
     "email": "john.doe@example.com",
@@ -17,7 +16,6 @@ def test_create_user(base_url: str, user_sub: str, user_session: Session, user_s
     "birthdate": str(date.today() - timedelta(days=365*30)),  # 30 years ago
   }
   response = user_session.post(url, json=payload)
-  print("Create User Response:", response.json())
   assert response.status_code == 200
   assert "user_id" in response.json()["user"]
   user_data = response.json()["user"]
@@ -52,11 +50,8 @@ def test_get_user(base_url: str, user_sub: str, user_session: Session) -> None:
 def test_get_another_user(base_url: str, user_sub: str, user_session: Session) -> None:
   url = f"{base_url}/user/foo"
   session = user_session
-  print('session:',session.headers)
-  response = user_session.get(url)
-  # change to 401 when auth is implemented
-  assert response.status_code == 500
-  # assert response.status_code == 401
+  response = session.get(url)
+  assert response.status_code == 401
 
 
 @pytest.mark.dependency(depends=[
@@ -84,7 +79,6 @@ def test_recreate_user(base_url: str, user_sub: str, user_session: Session, user
     "birthdate": str(date.today() - timedelta(days=365*30)),  # 30 years ago
   }
   response = user_session.post(url, json=payload)
-  print('recreated', response.json())
   assert response.status_code == 200
   assert "user_id" in response.json()["user"]
 

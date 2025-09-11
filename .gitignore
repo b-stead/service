@@ -2,7 +2,11 @@
 **db.sqlite3
 *.env
 **__pycache__
-
+**node_modules
+**.DS_Store
+**package-lock.json
+**.vscode
+**.dockerignore
 # Flutter/Dart/Pub related files
 .dart_tool/
 .flutter-plugins

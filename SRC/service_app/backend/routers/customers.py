@@ -64,7 +64,7 @@ async def get_customer(store: Store, sub: str, actor: Actor, customer_id: str) -
     if sub != actor:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     try:
-        result = await store.get_customer_by_id(queries.GetCustomerByIdParams(sub=sub, customer_id=customer_id))
+        result = await store.get_customer_by_id(sub=sub, customer_id=customer_id)
         if result is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return result
@@ -100,7 +100,7 @@ async def delete_customer(store: Store, sub: str, actor: Actor, customer_id: str
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     try:
         customer_id = customer_id
-        await store.delete_customer(customer_id=customer_id)
+        await store.delete_customer(customer_id=customer_id, sub=sub)
         return {"message": "Customer deleted successfully"}
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)

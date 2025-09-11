@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 from backend.db import Healthcheck
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 from .routers import user
 from .routers import customers
@@ -9,6 +10,14 @@ from .routers import auth
 app = FastAPI(
     title="Service App",
 )
+
+corsOrigins = [
+  "http://localhost",
+  "http://localhost:8000",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+]
+app.add_middleware(CORSMiddleware, allow_origins=corsOrigins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(user.router)
 app.include_router(customers.router)
