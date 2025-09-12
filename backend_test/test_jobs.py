@@ -12,7 +12,7 @@ def shared_data() -> dict[str, Any]:
 
 @pytest.mark.dependency(depends=["backend_test/test_customer.py::test_create_customer"], scope="session")
 def test_create_job(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
-    url = f"{base_url}/user/{user_sub}/job"
+    url = f"{base_url}/api/user/{user_sub}/job"
     customer_id = shared_data.get("customer_id")
     assert customer_id is not None, "customer_id must be set in shared_data"
     payload = {

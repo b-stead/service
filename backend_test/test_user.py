@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 @pytest.mark.dependency()
 def test_create_user(base_url: str, user_sub: str, user_session: Session, user_session_data: dict[str, Any]) -> None:
-  url = f"{base_url}/user"
+  url = f"{base_url}/api/user"
   payload = {
     "sub": user_sub,
     "email": "john.doe@example.com",
@@ -24,7 +24,7 @@ def test_create_user(base_url: str, user_sub: str, user_session: Session, user_s
 
 @pytest.mark.dependency()
 def test_create_user_again(base_url: str, user_sub: str, user_session: Session) -> None:
-  url = f"{base_url}/user"
+  url = f"{base_url}/api/user"
   payload = {
     "sub": user_sub,
     "email": "john.doe@example.com",
@@ -38,7 +38,7 @@ def test_create_user_again(base_url: str, user_sub: str, user_session: Session) 
 
 @pytest.mark.dependency(depends=["test_create_user"])
 def test_get_user(base_url: str, user_sub: str, user_session: Session) -> None:
-  url = f"{base_url}/user/{user_sub}"
+  url = f"{base_url}/api/user/{user_sub}"
   response = user_session.get(url)
   assert response.status_code == 200
   assert response.json()["sub"] == user_sub
@@ -48,7 +48,7 @@ def test_get_user(base_url: str, user_sub: str, user_session: Session) -> None:
 
 @pytest.mark.dependency(depends=["backend_test/test_user.py::test_create_user"], scope="session")
 def test_get_another_user(base_url: str, user_sub: str, user_session: Session) -> None:
-  url = f"{base_url}/user/foo"
+  url = f"{base_url}/api/user/foo"
   session = user_session
   response = session.get(url)
   assert response.status_code == 401
@@ -60,7 +60,7 @@ def test_get_another_user(base_url: str, user_sub: str, user_session: Session) -
   "test_get_another_user"
 ])
 def test_delete_user(base_url: str, user_sub: str, user_session: Session) -> None:
-  url = f"{base_url}/user/{user_sub}"
+  url = f"{base_url}/api/user/{user_sub}"
   response = user_session.delete(url)
   assert response.status_code == 200
 
@@ -70,7 +70,7 @@ def test_delete_user(base_url: str, user_sub: str, user_session: Session) -> Non
   "test_delete_user"
 ])
 def test_recreate_user(base_url: str, user_sub: str, user_session: Session, user_session_data: dict[str, Any]) -> None:
-  url = f"{base_url}/user"
+  url = f"{base_url}/api/user"
   payload = {
     "sub": user_sub,
     "email": user_session_data["email"],

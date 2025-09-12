@@ -12,7 +12,7 @@ def shared_data() -> dict[str, Any]:
 
 @pytest.mark.dependency(depends=["backend_test/test_user.py::test_create_user"], scope="session")
 def test_create_customer(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
-    url = f"{base_url}/user/{user_sub}/customer"
+    url = f"{base_url}/api/user/{user_sub}/customer"
     payload = {
         "sub": user_sub,
         "company_name": "Acme Corp",
@@ -39,7 +39,7 @@ def test_update_customer(base_url: str, user_sub: str, user_session: Session, sh
        "phone":"123-456-7890",
        "email":"updated@email.com"
     }
-    url = f"{base_url}/user/{user_sub}/customer/{customer_id}"
+    url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.put(url, json=payload)
     assert response.status_code == 200
 
@@ -50,14 +50,14 @@ def test_get_customer(base_url: str, user_sub: str, user_session: Session, share
     customer_id = shared_data["customer_id"]
     user_sub = user_session.params.get("sub", user_sub)
     assert "user_id" in shared_data
-    url = f"{base_url}/user/{user_sub}/customer/{customer_id}"
+    url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.dependency(depends=["test_create_customer"])
 def test_list_customers_by_sub(base_url: str, user_sub: str, user_session: Session) -> None:
-    url = f"{base_url}/user/{user_sub}/customers"
+    url = f"{base_url}/api/user/{user_sub}/customers"
     response = user_session.get(url)
     assert response.status_code == 200
     assert isinstance(response.json(), list)
@@ -68,7 +68,7 @@ def test_delete_customer(base_url: str, user_sub: str, user_session: Session, sh
     assert "customer_id" in shared_data
     customer_id = shared_data["customer_id"]
     user_sub = user_session.params.get("sub", user_sub)
-    url = f"{base_url}/user/{user_sub}/customer/{customer_id}"
+    url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.delete(url)
     assert response.status_code == 200
     assert response.json()["message"] == "Customer deleted successfully"
