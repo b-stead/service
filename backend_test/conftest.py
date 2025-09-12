@@ -8,7 +8,7 @@ from typing import Any
 from collections.abc import Generator
 import os
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://127.0.0.1:8000"
 TEST_SUB = "somerandomstring"
 USER_SUB = "testuser"
 
@@ -46,6 +46,11 @@ def session_data() -> dict[str, Any]:
 @pytest.fixture(scope="session")
 def user_session_data() -> dict[str, Any]:
   """session data for testing user create/update/delete"""
+  return {}
+
+@pytest.fixture(scope="session")
+def customer_session_data() -> dict[str, Any]:
+  """session data for testing customer create/update/delete"""
   return {}
 
 

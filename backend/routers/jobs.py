@@ -11,7 +11,7 @@ Job = models.Job
 router = APIRouter()
 
 
-@router.post("/user/{sub}/job", response_model=Job, status_code=status.HTTP_201_CREATED)
+@router.post("/api/user/{sub}/job", response_model=Job, status_code=status.HTTP_201_CREATED)
 async def create_job(store: Store, sub: str, actor: Actor, input: queries.CreateJobParams) -> Job:
     if sub != actor:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -35,7 +35,7 @@ async def create_job(store: Store, sub: str, actor: Actor, input: queries.Create
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.put("/user/{sub}/job/{job_id}", response_model=Job)
+@router.put("/api/user/{sub}/job/{job_id}", response_model=Job)
 async def update_job(
     store: Store, sub: str, actor: Actor, input: queries.UpdateJobParams
 ) -> Job:
@@ -58,7 +58,7 @@ async def update_job(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/job/{job_id}", response_model=Job)
+@router.get("/api/user/{sub}/job/{job_id}", response_model=Job)
 async def get_job(store: Store, sub: str, actor: Actor, job_id: str) -> Job:
     """
     Get a job by ID.
@@ -76,7 +76,7 @@ async def get_job(store: Store, sub: str, actor: Actor, job_id: str) -> Job:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/jobs", response_model=list[Job])
+@router.get("/api/user/{sub}/jobs", response_model=list[Job])
 async def list_jobs_by_sub(store: Store, sub: str, actor: Actor) -> list[Job]:
     """
     List all jobs for a user.
@@ -93,7 +93,7 @@ async def list_jobs_by_sub(store: Store, sub: str, actor: Actor) -> list[Job]:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/user/{sub}/job/{job_id}", status_code=status.HTTP_200_OK)
+@router.delete("/api/user/{sub}/job/{job_id}", status_code=status.HTTP_200_OK)
 async def delete_user(store: Store, sub: str, actor: Actor, job_id: str) -> dict:
     """
     Delete a job by ID.
@@ -109,7 +109,7 @@ async def delete_user(store: Store, sub: str, actor: Actor, job_id: str) -> dict
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/jobs/{customer_id}", response_model=list[Job], status_code=status.HTTP_200_OK)
+@router.get("/api/user/{sub}/jobs/{customer_id}", response_model=list[Job], status_code=status.HTTP_200_OK)
 async def get_jobs_by_customer(store: Store, sub: str, actor: Actor) -> list[Job]:
     """
     List all jobs by customer id.
@@ -125,7 +125,7 @@ async def get_jobs_by_customer(store: Store, sub: str, actor: Actor) -> list[Job
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/jobs/{status}", response_model=list[Job], status_code=status.HTTP_200_OK)
+@router.get("/api/user/{sub}/jobs/{status}", response_model=list[Job], status_code=status.HTTP_200_OK)
 async def get_jobs_by_status(store: Store, sub: str, actor: Actor) -> list[Job]:
     """
     List all jobs by status.
@@ -141,7 +141,7 @@ async def get_jobs_by_status(store: Store, sub: str, actor: Actor) -> list[Job]:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/user/{sub}/jobs/dates/{start}/{end}", response_model=list[Job], status_code=status.HTTP_200_OK)
+@router.get("/api/user/{sub}/jobs/dates/{start}/{end}", response_model=list[Job], status_code=status.HTTP_200_OK)
 async def get_jobs_by_date_range(store: Store, sub: str, actor: Actor) -> list[Job]:
     """
     List all jobs by date range.

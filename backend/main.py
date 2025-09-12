@@ -6,6 +6,7 @@ from starlette.responses import HTMLResponse
 from .routers import user
 from .routers import customers
 from .routers import auth
+from .routers import jobs
 
 app = FastAPI(
     title="Service App",
@@ -23,6 +24,7 @@ app.add_middleware(CORSMiddleware, allow_origins=corsOrigins, allow_credentials=
 app.include_router(user.router)
 app.include_router(customers.router)
 app.include_router(auth.router)
+app.include_router(jobs.router)
 
 
 @app.get("/docs", response_class=HTMLResponse)

@@ -5,13 +5,13 @@ from typing import Any
 from datetime import date, timedelta
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def shared_data() -> dict[str, Any]:
   return {}
 
 
 @pytest.mark.dependency(depends=["backend_test/test_user.py::test_create_user"], scope="session")
-def test_create_customer(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
+def test_create_customer(base_url: str, user_sub: str, user_session: Session, customer_session_data: dict[str, Any]) -> None:
     url = f"{base_url}/api/user/{user_sub}/customer"
     payload = {
         "sub": user_sub,
@@ -19,20 +19,17 @@ def test_create_customer(base_url: str, user_sub: str, user_session: Session, sh
         "email": "unique_email@example.com",   
     }
     response = user_session.post(url, json=payload)
-    print("Create Customer Response:", response.json())
     assert response.status_code == 201
     assert "customer_id" in response.json()
-    shared_data["customer_id"] = response.json()["customer_id"]
     customer_data = response.json()
-    shared_data.update(customer_data)
-    print("customer Data:", shared_data)
+    customer_session_data.update(customer_data)
 
 
 @pytest.mark.dependency(depends=["test_create_customer"])
-def test_update_customer(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
-    assert "customer_id" in shared_data
-    assert "user_id" in shared_data
-    customer_id = shared_data["customer_id"]
+def test_update_customer(base_url: str, user_sub: str, user_session: Session, customer_session_data: dict[str, Any]) -> None:
+    assert "customer_id" in customer_session_data
+    assert "user_id" in customer_session_data
+    customer_id = customer_session_data["customer_id"]
     payload = {
        "sub": user_sub,
        "customer_id": customer_id,
@@ -45,11 +42,11 @@ def test_update_customer(base_url: str, user_sub: str, user_session: Session, sh
 
 
 @pytest.mark.dependency(depends=["test_create_customer"])
-def test_get_customer(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
-    assert "customer_id" in shared_data
-    customer_id = shared_data["customer_id"]
+def test_get_customer(base_url: str, user_sub: str, user_session: Session, customer_session_data: dict[str, Any]) -> None:
+    assert "customer_id" in customer_session_data
+    customer_id = customer_session_data["customer_id"]
     user_sub = user_session.params.get("sub", user_sub)
-    assert "user_id" in shared_data
+    assert "user_id" in customer_session_data
     url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.get(url)
     assert response.status_code == 200
@@ -64,9 +61,9 @@ def test_list_customers_by_sub(base_url: str, user_sub: str, user_session: Sessi
 
 
 @pytest.mark.dependency(depends=["test_create_customer"])
-def test_delete_customer(base_url: str, user_sub: str, user_session: Session, shared_data: dict[str, Any]) -> None:
-    assert "customer_id" in shared_data
-    customer_id = shared_data["customer_id"]
+def test_delete_customer(base_url: str, user_sub: str, user_session: Session, customer_session_data: dict[str, Any]) -> None:
+    assert "customer_id" in customer_session_data
+    customer_id = customer_session_data["customer_id"]
     user_sub = user_session.params.get("sub", user_sub)
     url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.delete(url)
