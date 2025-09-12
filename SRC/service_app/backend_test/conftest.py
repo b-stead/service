@@ -76,10 +76,10 @@ def setup_and_teardown() -> Generator[None, None, None]:
   subprocess.run([
     "docker",
     "compose",
-    "--project-directory=./SRC/service_app",
+    "--project-directory=SRC/service_app",
     "--project-name=service-app",
-    "--file=repository/compose.yaml",
-    "--file=backend/compose.yaml",
+    "--file=SRC/service_app/repository/compose.yaml",
+    "--file=SRC/service_app/backend/compose.yaml",
     "up",
     "--detach"
   ], check=True, env=env)
