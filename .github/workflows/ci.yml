@@ -22,19 +22,18 @@ jobs:
             - uses: ariga/setup-atlas@v0
             - name: pip install
               run: |
-                pip install -r SRC/service_app/requirements.txt
+                pip install -r requirements.txt
             - name: flake8
-              working-directory: ./SRC/service_app
               run: |
                 flake8 backend
             - uses: docker/setup-buildx-action@v3
             - name: docker build
               uses: docker/build-push-action@v6
               with:
-                context: SRC/service_app/backend
+                context: backend
                 load: true
                 tags: backend:latest
             - name: test
               run: |
-                pytest SRC/service_app/backend_test --order-dependencies
+                pytest backend_test --order-dependencies
 
