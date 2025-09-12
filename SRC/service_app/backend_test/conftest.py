@@ -76,7 +76,7 @@ def setup_and_teardown() -> Generator[None, None, None]:
   subprocess.run([
     "docker",
     "compose",
-    "--project-directory=.",
+    "--project-directory=./SRC/service_app",
     "--project-name=service-app",
     "--file=repository/compose.yaml",
     "--file=backend/compose.yaml",
@@ -105,7 +105,7 @@ def setup_and_teardown() -> Generator[None, None, None]:
     "apply",
     "--auto-approve",
     "--url=postgresql://postgres:password@localhost:5432/postgres?sslmode=disable",
-    "--to=file://repository/schema/schema.sql",
+    "--to=file://SRC/service_app/repository/schema/schema.sql",
     "--dev-url=docker://postgres/16"
   ], check=True)
 
@@ -123,7 +123,7 @@ def setup_and_teardown() -> Generator[None, None, None]:
     "psql",
     "-v",
     "ON_ERROR_STOP=1",
-    "--file=repository/testdata/testdata.sql",
+    "--file=SRC/service_app/repository/testdata/testdata.sql",
     "postgresql://postgres:password@localhost:5432/postgres?sslmode=disable"
   ], check=True)
 
