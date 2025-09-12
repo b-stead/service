@@ -7,7 +7,7 @@ Current frontend implementation needs to change to support FastAPI over DRF.
 Added Pytest to CI
 
 Next Steps: 
-testing CI
+testing CI again
 Full testing for Jobs/Auth
 Add invoicing
 Build out test data
