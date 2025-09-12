@@ -17,7 +17,7 @@ class CreateUserResponse(BaseModel):
     user: User
 
 
-@router.post("/user", response_model=CreateUserResponse)
+@router.post("/api/user", response_model=CreateUserResponse)
 async def create_user(store: Store, actor: NewActor, input: queries.CreateUserParams) -> User:
     """
     Create a new user.
@@ -46,7 +46,7 @@ async def create_user(store: Store, actor: NewActor, input: queries.CreateUserPa
     return CreateUserResponse(message="User created successfully", user=result)
 
 
-@router.get("/user/{sub}", status_code=status.HTTP_200_OK)
+@router.get("/api/user/{sub}", status_code=status.HTTP_200_OK)
 async def get_user(store: Store, sub: str, actor: Actor) -> User:
     if sub != actor:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -59,7 +59,7 @@ async def get_user(store: Store, sub: str, actor: Actor) -> User:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.delete("/user/{sub}", status_code=status.HTTP_200_OK)
+@router.delete("/api/user/{sub}", status_code=status.HTTP_200_OK)
 async def delete_user(store: Store, sub: str, actor: Actor) -> dict:
     if sub != actor:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -71,7 +71,7 @@ async def delete_user(store: Store, sub: str, actor: Actor) -> dict:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/users", response_model=list[User], status_code=status.HTTP_200_OK)
+@router.get("/api/users", response_model=list[User], status_code=status.HTTP_200_OK)
 async def list_users(store: Store) -> list[User]:
     try:
         result = [user async for user in store.list_users()]  # Consume the async generator
