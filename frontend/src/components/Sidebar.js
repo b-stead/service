@@ -1,48 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { XMarkIcon } from "@heroicons/react/24/outline"; // Ensure you have Heroicons installed
 
-const Sidebar = ({ setView}) => {
+const Sidebar = ({ isOpen, onClose }) => {
+  const links = [
+    { name: "Customers", path: "/dashboard/customers" },
+    { name: "Jobs", path: "/dashboard/jobs" },
+    { name: "Invoices", path: "/dashboard/invoices" },
+  ];
+
   return (
-    <div className="w-56 bg-primary text-white h-screen flex flex-col">
-      {/* Logo Section */}
-      <div className="h-16 bg-secondary flex items-center justify-center">
-        <img
-          src="/path-to-your-logo.png" // Replace with your logo path
-          alt="Logo"
-          className="h-10 w-auto"
-        />
+    <aside
+      className={`fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-80"
+      } border border-blue-gray-100 bg-primary text-black`}
+    >
+      {/* Close Button */}
+      <div className="flex justify-between items-center p-4">
+        {/* Dashboard Header as a Link */}
+        <Link to="/dashboard" className="text-center font-bold text-lg text-white hover:underline">
+          Dashboard
+        </Link>
+        <button onClick={onClose} className="text-white">
+          <XMarkIcon className="h-6 w-6" />
+        </button>
       </div>
 
       {/* Navigation Links */}
-      <nav className="p-4 flex-1">
-        <ul>
-          <li className="mb-4">
-            <button
-              onClick={() => setView("customers")}
-              className="hover:text-tertiary"
-            >
-              Manage Customers
-            </button>
-          </li>
-          <li className="mb-4">
-            <button
-              onClick={() => setView("jobs")}
-              className="hover:text-tertiary"
-            >
-              Manage Jobs
-            </button>
-          </li>
-          <li className="mb-4">
-            <button
-              onClick={() => setView("invoices")}
-              className="hover:text-tertiary"
-            >
-              Manage Invoices
-            </button>
-          </li>
+      <nav className="mt-4">
+        <ul className="space-y-2 mx-4">
+          {links.map((link) => (
+            <li key={link.name} className="mb-2 text-white">
+              <NavLink
+                to={link.path}
+                className={({ isActive }) =>
+                  `block px-4 py-2 rounded ${
+                    isActive
+                      ? "bg-tertiary text-black" // Active: background and black text
+                      : "text-white hover:bg-secondary hover:text-black" // Inactive: white text, black on hover
+                  }`
+                }
+              >
+                {link.name}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 

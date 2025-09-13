@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -6,7 +7,7 @@ module.exports = {
     "./frontend/src/**/*.{js,jsx,ts,tsx}",
     "./frontend/public/index.html",
     "/app/src/**/*.{js,jsx,ts,tsx}", // Adjusted for Docker build context
-    "/app/public/index.html", 
+    "/app/public/index.html",
   ],
   theme: {
     extend: {
@@ -19,5 +20,5 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
 
