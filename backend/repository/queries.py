@@ -199,6 +199,41 @@ AND "is_deleted" = FALSE
 """
 
 
+LIST_JOBS_WITH_CUSTOMER_BY_SUB = """-- name: list_jobs_with_customer_by_sub \\:many
+SELECT 
+    jobs.job_id, jobs.user_id, jobs.customer_id, jobs.job_title, jobs.job_description, jobs.job_status, jobs.start_date, jobs.end_date, jobs.estimated_hours, jobs.actual_hours, jobs.daily_rate, jobs.hourly_rate, jobs.total_amount, jobs.created_at, jobs.updated_at, jobs.is_deleted, jobs.deleted_at,
+    customers.name AS customer_name
+FROM 
+    "jobs"
+JOIN 
+    "customers" ON jobs.customer_id = customers.customer_id
+WHERE 
+    jobs.user_id = (SELECT "user_id" FROM "user" WHERE "sub" = :p1 AND "is_deleted" = FALSE)
+    AND jobs.is_deleted = FALSE
+"""
+
+
+class ListJobsWithCustomerBySubRow(pydantic.BaseModel):
+    job_id: str
+    user_id: str
+    customer_id: str
+    job_title: str
+    job_description: Optional[str] = None
+    job_status: str
+    start_date: Optional[datetime.date] = None
+    end_date: Optional[datetime.date] = None
+    estimated_hours: Optional[decimal.Decimal] = None
+    actual_hours: Optional[decimal.Decimal] = None
+    daily_rate: Optional[decimal.Decimal] = None
+    hourly_rate: Optional[decimal.Decimal] = None
+    total_amount: Optional[decimal.Decimal] = None
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    is_deleted: bool
+    deleted_at: Optional[datetime.datetime] = None
+    customer_name: Optional[str] = None
+
+
 LIST_USERS = """-- name: list_users \\:many
 SELECT user_id, sub, email, email_verified, first_name, last_name, birthdate, created_date, updated_at, is_deleted, deleted_at FROM "user"
 """
@@ -645,6 +680,30 @@ class AsyncQuerier:
                 updated_at=row[14],
                 is_deleted=row[15],
                 deleted_at=row[16],
+            )
+
+    async def list_jobs_with_customer_by_sub(self, *, sub: str) -> AsyncIterator[ListJobsWithCustomerBySubRow]:
+        result = await self._conn.stream(sqlalchemy.text(LIST_JOBS_WITH_CUSTOMER_BY_SUB), {"p1": sub})
+        async for row in result:
+            yield ListJobsWithCustomerBySubRow(
+                job_id=row[0],
+                user_id=row[1],
+                customer_id=row[2],
+                job_title=row[3],
+                job_description=row[4],
+                job_status=row[5],
+                start_date=row[6],
+                end_date=row[7],
+                estimated_hours=row[8],
+                actual_hours=row[9],
+                daily_rate=row[10],
+                hourly_rate=row[11],
+                total_amount=row[12],
+                created_at=row[13],
+                updated_at=row[14],
+                is_deleted=row[15],
+                deleted_at=row[16],
+                customer_name=row[17],
             )
 
     async def list_users(self) -> AsyncIterator[models.User]:

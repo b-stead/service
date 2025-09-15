@@ -1,10 +1,11 @@
 import React from "react";
+import JobsList from "../components/JobsList";
 
 const JobsPage = () => {
+  const sub = "somerandomstring"; // Hardcoded sub value for now
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Manage Jobs</h1>
-      <p>Here you can view, add, edit, and delete jobs.</p>
+      <JobsList sub={sub}  /> {/* Render the JobsList component */}
     </div>
   );
 };

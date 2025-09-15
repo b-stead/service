@@ -1,10 +1,11 @@
 import React from "react";
+import CustomersList from "../components/CustomersList";
 
 const CustomersPage = () => {
+  const sub = "somerandomstring"; // Hardcoded sub value for now
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Manage Customers</h1>
-      <p>Here you can view, add, edit, and delete customers.</p>
+      <CustomersList sub={sub}  /> {/* Render the CustomersList component */}
     </div>
   );
 };

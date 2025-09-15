@@ -1,5 +1,5 @@
 import React from "react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Bars3Icon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import { useLocation } from "react-router-dom";
 
 const Navbar = ({ isSidebarOpen, onMenuClick }) => {
@@ -23,10 +23,11 @@ const Navbar = ({ isSidebarOpen, onMenuClick }) => {
         <span className="text-sm pl-2 font-semibold text-gray-900">
            {formattedPageName}
         </span>
-          </div>
-          <div className="ml-auto text-sm text-gray-600"> Sign In
-            
-          </div>
+      </div>
+      <div className="ml-auto mr-4 flex items-center space-x-2 text-sm text-accent_dark font-bold cursor-pointer hover:text-gray-900">
+        <ArrowRightOnRectangleIcon className="h-5 w-5" /> {/* Sign In/Out Icon */}
+        <span>Sign In</span>
+      </div>
     </header>
   );
 };

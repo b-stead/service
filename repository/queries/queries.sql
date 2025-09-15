@@ -120,6 +120,18 @@ SELECT * FROM "jobs"
 WHERE "user_id" = (SELECT "user_id" FROM "user" WHERE "sub" = $1 AND "is_deleted" = FALSE)
 AND "is_deleted" = FALSE;
 
+-- name: ListJobsWithCustomerBySub :many
+SELECT 
+    jobs.*,
+    customers.name AS customer_name
+FROM 
+    "jobs"
+JOIN 
+    "customers" ON jobs.customer_id = customers.customer_id
+WHERE 
+    jobs.user_id = (SELECT "user_id" FROM "user" WHERE "sub" = $1 AND "is_deleted" = FALSE)
+    AND jobs.is_deleted = FALSE;
+
 -- name: UpdateJob :one
 UPDATE "jobs"
 SET
