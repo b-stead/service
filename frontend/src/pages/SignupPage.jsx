@@ -10,7 +10,7 @@ const SignupPage = () => {
           src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=500"
           className="mx-auto h-10 w-auto"
         />
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-black">
+        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
           Create your account
         </h2>
       </div>
@@ -24,10 +24,10 @@ const SignupPage = () => {
               name="name"
               type="text"
               required
-              className="peer block w-full rounded-md bg-white/5 px-3 pt-5 pb-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm/6"
+              className="peer block w-full rounded-md bg-white px-3 pt-5 pb-2 text-base text-accent_dark outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm"
               placeholder="Full Name"
             />
-            <span className="absolute left-3 top-2 text-sm text-gray-500 transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-secondary">
+            <span className="absolute pointer-events-none left-3 top-2 text-sm text-black transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-accent_dark peer-focus:top-0 peer-focus:text-sm peer-focus:text-accent_dark">
               Full Name
             </span>
           </div>
@@ -39,10 +39,10 @@ const SignupPage = () => {
               name="email"
               type="email"
               required
-              className="peer block w-full rounded-md bg-white/5 px-3 pt-5 pb-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm/6"
+              className="peer block w-full rounded-md bg-white px-3 pt-5 pb-2 text-base text-accent_dark outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm"
               placeholder="Email Address"
             />
-            <span className="absolute left-3 top-2 text-sm text-gray-500 transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-secondary">
+            <span className="absolute pointer-events-none left-3 top-2 text-sm text-black transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-accent_dark peer-focus:top-0 peer-focus:text-sm peer-focus:text-accent_dark">
               Email Address
             </span>
           </div>
@@ -54,10 +54,10 @@ const SignupPage = () => {
               name="password"
               type="password"
               required
-              className="peer block w-full rounded-md bg-white/5 px-3 pt-5 pb-2 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm/6"
+              className="peer block w-full rounded-md bg-white px-3 pt-5 pb-2 text-base text-accent_dark outline-1 -outline-offset-1 outline-white/10 placeholder-transparent focus:outline-2 focus:-outline-offset-2 focus:outline-secondary sm:text-sm"
               placeholder="Password"
             />
-            <span className="absolute left-3 top-2 text-sm text-gray-500 transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-secondary">
+            <span className="absolute pointer-events-none left-3 top-2 text-sm text-black transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-accent_dark peer-focus:top-0 peer-focus:text-sm peer-focus:text-accent_dark">
               Password
             </span>
           </div>
@@ -66,18 +66,18 @@ const SignupPage = () => {
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-tertiary px-3 py-1.5 text-sm/6 font-semibold text-black hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:secondary"
+              className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-tertiary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
             >
               Sign up
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm/6 text-gray-400">
+        <p className="mt-10 text-center text-sm/6 text-white">
           Already have an account?{" "}
           <Link
-            to="/auth/login"
-            className="font-semibold text-tertiary hover:text-secondary"
+            to="/auth/"
+            className="font-semibold text-accent_light hover:text-primary"
           >
             Sign in
           </Link>

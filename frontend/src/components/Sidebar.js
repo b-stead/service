@@ -13,15 +13,15 @@ const Sidebar = ({ isOpen, onClose }) => {
     <aside
       className={`fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 ${
         isOpen ? "translate-x-0" : "-translate-x-80"
-      } border border-blue-gray-100 bg-primary text-black`}
+      } border border-blue-gray-100 bg-quaternary text-black`}
     >
       {/* Close Button */}
       <div className="flex justify-between items-center p-4">
         {/* Dashboard Header as a Link */}
-        <Link to="/dashboard" className="text-center font-bold text-lg text-white hover:underline">
+        <Link to="/dashboard" className="text-center font-bold text-lg text-black hover:underline">
           Dashboard
         </Link>
-        <button onClick={onClose} className="text-white">
+        <button onClick={onClose} className="text-accent_dark">
           <XMarkIcon className="h-6 w-6" />
         </button>
       </div>
@@ -30,14 +30,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       <nav className="mt-4">
         <ul className="space-y-2 mx-4">
           {links.map((link) => (
-            <li key={link.name} className="mb-2 text-white">
+            <li key={link.name} className="mb-2 text-black">
               <NavLink
                 to={link.path}
                 className={({ isActive }) =>
                   `block px-4 py-2 rounded ${
                     isActive
-                      ? "bg-tertiary text-black" // Active: background and black text
-                      : "text-white hover:bg-secondary hover:text-black" // Inactive: white text, black on hover
+                      ? "bg-tertiary text-white" // Active: background and black text
+                      : "text-black hover:text-white" // Inactive: white text, black on hover
                   }`
                 }
               >

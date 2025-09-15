@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 const AuthLayout = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <div className="w-full max-w-md bg-primary p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-md bg-quinary p-8 rounded-lg shadow-md">
         <Outlet /> {/* Render the specific auth page here */}
       </div>
     </div>
