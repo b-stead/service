@@ -8,6 +8,7 @@ import structlog
 logger = structlog.get_logger(module=__name__)
 
 Job = models.Job
+ListJob = queries.ListJobsWithCustomerBySubRow
 router = APIRouter()
 
 
@@ -150,6 +151,23 @@ async def get_jobs_by_date_range(store: Store, sub: str, actor: Actor) -> list[J
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     try:
         result = [job async for job in store.get_jobs_by_date_range()]
+        return result
+
+    except Exception as err:
+        logger.error(f"unexpected error: {err}", exc_info=err)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.get("/api/user/{sub}/jobs-customer/", response_model=list[ListJob], status_code=status.HTTP_200_OK)
+async def list_jobs_with_customer_by_sub(store: Store, sub: str, actor: Actor) -> int:
+    """
+    List all jobs with customer details for a user.
+    """
+    if sub != actor:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    try:
+        sub_ = sub
+        result = [job async for job in store.list_jobs_with_customer_by_sub(sub=sub_)]
         return result
 
     except Exception as err:
