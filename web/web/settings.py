@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from datetime import timedelta
 import os
 from dotenv import load_dotenv
 import sys
@@ -157,8 +156,8 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS = {'email'}
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SIGNUP_REDIRECT_URL = 'account_login'
-# ACCOUNT_ADAPTER = 'users.adapter.CustomAccountAdapter'
-# SOCIALACCOUNT_ADAPTER = 'users.adapter.CustomSocialAccountAdapter'
+# ACCOUNT_ADAPTER = 'users.adapter.CustomAccountAdapter'
+# SOCIALACCOUNT_ADAPTER = 'users.adapter.CustomSocialAccountAdapter'
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Internationalization
@@ -203,7 +202,7 @@ INTERNAL_IPS = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+    'http://localhost:3000'
 ]
 
 REST_FRAMEWORK = {

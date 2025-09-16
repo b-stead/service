@@ -156,7 +156,8 @@ async def get_jobs_by_date_range(store: Store, sub: str, actor: Actor) -> list[J
     except Exception as err:
         logger.error(f"unexpected error: {err}", exc_info=err)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
 @router.get("/api/user/{sub}/jobs-customer/", response_model=list[ListJob], status_code=status.HTTP_200_OK)
 async def list_jobs_with_customer_by_sub(store: Store, sub: str, actor: Actor) -> int:
     """

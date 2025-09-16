@@ -1,13 +1,11 @@
 import pytest
-import re
 from requests import Session
 from typing import Any
-from datetime import date, timedelta
 
 
 @pytest.fixture(scope="session")
 def shared_data() -> dict[str, Any]:
-  return {}
+    return {}
 
 
 @pytest.mark.dependency(depends=["backend_test/test_user.py::test_create_user"], scope="session")
@@ -16,7 +14,7 @@ def test_create_customer(base_url: str, user_sub: str, user_session: Session, cu
     payload = {
         "sub": user_sub,
         "company_name": "Acme Corp",
-        "email": "unique_email@example.com",   
+        "email": "unique_email@example.com",
     }
     response = user_session.post(url, json=payload)
     assert response.status_code == 201
@@ -31,10 +29,10 @@ def test_update_customer(base_url: str, user_sub: str, user_session: Session, cu
     assert "user_id" in customer_session_data
     customer_id = customer_session_data["customer_id"]
     payload = {
-       "sub": user_sub,
-       "customer_id": customer_id,
-       "phone":"123-456-7890",
-       "email":"updated@email.com"
+        "sub": user_sub,
+        "customer_id": customer_id,
+        "phone": "123-456-7890",
+        "email": "updated@email.com",
     }
     url = f"{base_url}/api/user/{user_sub}/customer/{customer_id}"
     response = user_session.put(url, json=payload)
@@ -69,4 +67,3 @@ def test_delete_customer(base_url: str, user_sub: str, user_session: Session, cu
     response = user_session.delete(url)
     assert response.status_code == 200
     assert response.json()["message"] == "Customer deleted successfully"
-

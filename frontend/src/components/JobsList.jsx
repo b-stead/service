@@ -55,7 +55,7 @@ const JobsList = ({ sub }) => {
     return (
         <section>
             <div class="flex flex-col justify-center h-full w-full">
-                <div class="w-full bg-white shadow-lg rounded-sm border border-gray-200">
+                <div class="w-full bg-white shadow-lg rounded-lg border border-gray-200">
                     <header class="px-5 py-4 border-b border-gray-100">
                         <h2 class="font-semibold text-gray-800">Customers</h2>
                     </header>
@@ -70,6 +70,7 @@ const JobsList = ({ sub }) => {
                                         <th className="py-2 px-4 border-b">Status</th>
                                         <th className="py-2 px-4 border-b">Created At</th>
                                         <th className="py-2 px-4 border-b">Updated At</th>
+                                        <th className="py-2 px-4 border-b">Value</th>
                                     </tr>
                                 </thead>
                                 <tbody>
