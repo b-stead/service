@@ -29,6 +29,38 @@ class Customer(pydantic.BaseModel):
     deleted_at: Optional[datetime.datetime] = None
 
 
+class Invoice(pydantic.BaseModel):
+    invoice_id: str
+    user_id: str
+    job_id: str
+    customer_id: str
+    invoice_number: str
+    invoice_date: datetime.date
+    due_date: Optional[datetime.date] = None
+    subtotal: decimal.Decimal
+    tax_rate: Optional[decimal.Decimal] = None
+    tax_amount: Optional[decimal.Decimal] = None
+    total_amount: decimal.Decimal
+    invoice_status: str
+    payment_date: Optional[datetime.date] = None
+    notes: Optional[str] = None
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+    is_deleted: bool
+    deleted_at: Optional[datetime.datetime] = None
+
+
+class InvoiceLineItem(pydantic.BaseModel):
+    line_item_id: str
+    invoice_id: str
+    description: str
+    quantity: decimal.Decimal
+    unit_price: decimal.Decimal
+    total_price: decimal.Decimal
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
+
+
 class Job(pydantic.BaseModel):
     job_id: str
     user_id: str

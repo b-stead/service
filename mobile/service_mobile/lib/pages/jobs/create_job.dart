@@ -3,7 +3,7 @@ import 'package:service_mobile/services/job_service.dart';
 import 'package:intl/intl.dart';
 
 class CreateJobsPage extends StatefulWidget {
-  const CreateJobsPage({Key? key}) : super(key: key);
+  const CreateJobsPage({super.key});
 
   @override
   _CreateJobsPageState createState() => _CreateJobsPageState();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:service_mobile/services/job_service.dart';
 
 class JobsPage extends StatefulWidget {
-  const JobsPage({Key? key}) : super(key: key);
+  const JobsPage({super.key});
 
   @override
   _JobsPageState createState() => _JobsPageState();
