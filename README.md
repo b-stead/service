@@ -12,3 +12,5 @@ Full testing for Jobs/Auth
 Add invoicing
 Build out test data
 
+add cd
+
