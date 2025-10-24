@@ -36,7 +36,7 @@ jobs:
         working-directory: .
 
         run: |
-          docker compose -f compose.yml build frontend backend
+          docker compose -f backend/compose.yml build frontend backend
 
       - name: Tag and push frontend image
         run: |
