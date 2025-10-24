@@ -20,8 +20,6 @@ services:
       LOG_STYLE: ${LOG_STYLE:-json}
     networks:
       - app-network
-    depends_on:
-      - backend-db
 
   frontend:
     build:
